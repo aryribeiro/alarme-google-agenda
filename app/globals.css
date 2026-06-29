@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-primary: #0A0A0F;
+  --color-bg-card: #13131A;
+  --color-bg-elevated: #1C1C28;
+  --color-accent-red: #E53935;
+  --color-accent-red-bright: #FF1744;
+  --color-accent-orange: #F57C00;
+  --color-accent-yellow: #F9A825;
+  --color-accent-green: #00C853;
+  --color-text-primary: #F5F5F5;
+  --color-text-muted: #9E9E9E;
+  --color-border: #2A2A3A;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0A0F;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #F5F5F5;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #CCCCCC;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #F5F5F5 #0A0A0F;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
