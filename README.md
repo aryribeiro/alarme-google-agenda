@@ -31,6 +31,16 @@ Sistema de alarme impossível de ignorar, sincronizado com o Google Calendar. Al
 | Estilo | Tailwind CSS v3 (tema dark customizado) |
 | Deploy | Vercel |
 
+## Logo personalizada
+
+O web app exibe uma logo na tela de login e no header. Adicione a sua própria:
+
+1. Crie uma imagem PNG com **fundo transparente**
+2. Tamanho recomendado: **1024 x 461 px** (proporção ~2.2:1)
+3. Salve como `public/som/logo.png`
+
+A logo não está incluída no repositório — cada instalação usa a sua.
+
 ## Pré-requisitos
 
 - Node.js 18+
