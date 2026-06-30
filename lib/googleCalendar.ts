@@ -124,6 +124,15 @@ export async function fetchRooms(accessToken: string): Promise<Room[]> {
     })
   }
 
-  rooms.sort((a, b) => a.name.localeCompare(b.name))
-  return rooms
+  const unique = new Map<string, Room>()
+  rooms.forEach((room) => {
+    if (!unique.has(room.name)) {
+      unique.set(room.name, room)
+    }
+  })
+
+  const result: Room[] = []
+  unique.forEach((room) => result.push(room))
+  result.sort((a, b) => a.name.localeCompare(b.name))
+  return result
 }

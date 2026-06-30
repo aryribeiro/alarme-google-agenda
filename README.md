@@ -1,6 +1,6 @@
-# Alarme Google Agenda 2026
+<p align="center"><img width="700" height="478" alt="print" src="https://github.com/user-attachments/assets/02f80453-9ef9-4f39-a18d-d0885890e72d" /></p>
 
-Sistema de alarme impossível de ignorar, sincronizado com o Google Calendar. Alarme sonoro, visual (overlay vermelho fullscreen) e push notifications para garantir que você nunca mais perca uma reunião.
+O web app **Alarme Google Agenda 2026** é um sistema de alarme impossível de ignorar, sincronizado com o Google Agenda (Calendar). Alarme sonoro, visual (overlay vermelho fullscreen) e push notifications para garantir que você nunca mais perca uma reunião.
 
 ## Recursos
 
@@ -44,7 +44,7 @@ A logo não está incluída no repositório — cada instalação usa a sua.
 ## Pré-requisitos
 
 - Node.js 18+
-- Conta Google Cloud com billing habilitado (tier gratuito é suficiente)
+- Conta Google Cloud (a API é gratuita)
 - Vercel CLI (`npm i -g vercel`) ou conta na vercel.com
 
 ## Passo a passo: do zero à produção
@@ -87,7 +87,7 @@ npm install
 4. Name: `Alarme Agenda Web`
 5. Em **Authorized redirect URIs**, adicione:
    - `http://localhost:3000/api/auth/callback/google` (desenvolvimento)
-   - `https://seu-dominio.vercel.app/api/auth/callback/google` (produção)
+   - `https://seu-app.vercel.app/api/auth/callback/google` (produção)
 6. Clique em **Create**
 7. Copie o **Client ID** e **Client Secret**
 
@@ -107,7 +107,6 @@ GOOGLE_CLIENT_SECRET=seu_client_secret
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=gere_com_comando_abaixo
 ```
-
 Para gerar o `NEXTAUTH_SECRET`:
 
 ```bash
@@ -120,7 +119,7 @@ openssl rand -base64 32
 npm run dev
 ```
 
-Acesse `http://localhost:3000`, faça login com sua conta Google e verifique se os eventos aparecem.
+Acesse `http://localhost:3000`, faça login com sua conta Google e verifique se os eventos do Google Agenda aparecem.
 
 ### 7. Deploy na Vercel
 
@@ -141,7 +140,7 @@ vercel --prod
 |----------|-------|
 | `GOOGLE_CLIENT_ID` | Seu Client ID do Google Cloud |
 | `GOOGLE_CLIENT_SECRET` | Seu Client Secret do Google Cloud |
-| `NEXTAUTH_URL` | URL do deploy (ex: `https://alarme-agenda.vercel.app`) |
+| `NEXTAUTH_URL` | URL do deploy (ex: `https://seu-app.vercel.app`) |
 | `NEXTAUTH_SECRET` | Resultado do `openssl rand -base64 32` |
 
 4. Deploy
@@ -151,7 +150,8 @@ vercel --prod
 Após o primeiro deploy, volte ao Google Cloud Console e adicione a URL de produção nas Authorized redirect URIs:
 
 ```
-https://seu-dominio.vercel.app/api/auth/callback/google
+https://seu-app.vercel.app/api/auth/callback/google
+https://seu-app.vercel.app no campo sobre JavaScript...
 ```
 
 ## Estrutura do projeto
@@ -203,11 +203,9 @@ https://seu-dominio.vercel.app/api/auth/callback/google
 | Critical | 5 min | Som em loop + overlay vermelho + push + vibração |
 | Maximum | 0 min (evento iniciou) | Som máximo + overlay vermelho + push + vibração |
 
-Todos os valores são configuráveis no painel admin.
-
 ## Salas de reunião
 
-O menu hambúrguer (canto inferior esquerdo) sincroniza automaticamente salas do Google Calendar. Para que uma sala apareça:
+O menu hambúrguer (canto inferior esquerdo) sincroniza automaticamente salas permanentes do Google Agenda (Calendar) caso existam ou tenham sido configuradas previamente. Para que uma sala apareça:
 
 1. Crie um evento **all-day** (dia inteiro) no Google Calendar
 2. O nome do evento deve conter **"SALA INTERNA"** (ex: "SALA INTERNA 1 - Marketing")
