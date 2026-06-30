@@ -31,7 +31,13 @@ export function useNotifications() {
   const sendNotification = useCallback((event: CalendarEvent, level: AlarmLevel) => {
     if (permission !== 'granted') return
 
-    const notifKey = `${event.id}-${level}`
+    const isScreenOff = document.visibilityState === 'hidden'
+    const isUrgent = level === 'critical' || level === 'maximum'
+
+    const notifKey = isScreenOff && isUrgent
+      ? `${event.id}-${level}-bg-${Math.floor(Date.now() / 30000)}`
+      : `${event.id}-${level}`
+
     if (notifiedRef.current.has(notifKey)) return
     notifiedRef.current.add(notifKey)
 
@@ -57,6 +63,7 @@ export function useNotifications() {
         title,
         body,
         tag: event.id,
+        level,
         url: event.hangoutLink || '/',
       })
     } else {

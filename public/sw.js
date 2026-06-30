@@ -8,17 +8,22 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'ALARM') {
-    const { title, body, tag, url } = event.data
+    const { title, body, tag, url, level } = event.data
+
+    const isUrgent = level === 'critical' || level === 'maximum'
 
     event.waitUntil(
       self.registration.showNotification(title, {
         body,
-        tag,
+        tag: isUrgent ? `${tag}-${Date.now()}` : tag,
         icon: '/som/logo.png',
         badge: '/som/logo.png',
-        vibrate: [200, 100, 200, 100, 200, 100, 200],
+        vibrate: isUrgent
+          ? [300, 100, 300, 100, 300, 100, 300, 100, 300]
+          : [200, 100, 200, 100, 200],
         requireInteraction: true,
         renotify: true,
+        silent: false,
         data: { url },
       })
     )
