@@ -37,8 +37,13 @@ export function useCalendarPolling() {
         throw new Error(data.error || 'Falha ao buscar eventos')
       }
 
-      const events: CalendarEvent[] = await res.json()
+      const allEvents: CalendarEvent[] = await res.json()
       const config = getAdminConfig()
+      const now = Date.now()
+      const events = allEvents.filter((e) => {
+        const end = new Date(e.end).getTime()
+        return end > now - 30 * 60 * 1000
+      })
 
       setState((prev) => ({
         ...prev,

@@ -6,7 +6,6 @@ import { AlarmContext } from '@/hooks/useAlarmState'
 import { useCalendarPolling } from '@/hooks/useCalendarPolling'
 import { useAlarmAudio } from '@/hooks/useAlarmAudio'
 import { useNotifications } from '@/hooks/useNotifications'
-import { useWakeLock } from '@/hooks/useWakeLock'
 
 function AlarmProvider({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
@@ -15,8 +14,6 @@ function AlarmProvider({ children }: { children: React.ReactNode }) {
   const notifications = useNotifications()
   const [isTestActive, setIsTestActive] = useState(false)
   const testTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useWakeLock()
 
   useEffect(() => {
     if (status === 'authenticated' && notifications.permission === 'default') {

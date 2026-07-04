@@ -34,8 +34,13 @@ export async function fetchUpcomingEvents(accessToken: string): Promise<Calendar
   const calendar = google.calendar({ version: 'v3', auth })
 
   const now = new Date()
-  const endOfDay = new Date(now)
-  endOfDay.setHours(23, 59, 59, 999)
+  const brtDate = new Date(now.getTime() - 3 * 60 * 60 * 1000)
+  const endOfDay = new Date(Date.UTC(
+    brtDate.getUTCFullYear(),
+    brtDate.getUTCMonth(),
+    brtDate.getUTCDate(),
+    26, 59, 59, 999
+  ))
 
   const allEvents: CalendarEvent[] = []
   let pageToken: string | undefined
@@ -43,7 +48,7 @@ export async function fetchUpcomingEvents(accessToken: string): Promise<Calendar
   do {
     const response = await calendar.events.list({
       calendarId: 'primary',
-      timeMin: now.toISOString(),
+      timeMin: new Date(now.getTime() - 60 * 60 * 1000).toISOString(),
       timeMax: endOfDay.toISOString(),
       singleEvents: true,
       orderBy: 'startTime',

@@ -57,25 +57,10 @@ export function useAlarmAudio() {
 
       isUnlockedRef.current = true
       setIsUnlocked(true)
-      localStorage.setItem('alarm-audio-unlocked', '1')
     } catch {
-      const ctx = new AudioContext()
-      await ctx.resume()
-      audioContextRef.current = ctx
-      useFallbackRef.current = true
-      isUnlockedRef.current = true
-      setIsUnlocked(true)
-      localStorage.setItem('alarm-audio-unlocked', '1')
+      // Browser blocked audio — keep banner visible
     }
   }, [])
-
-  useEffect(() => {
-    if (isUnlockedRef.current) return
-    const wasUnlocked = localStorage.getItem('alarm-audio-unlocked') === '1'
-    if (wasUnlocked) {
-      unlock()
-    }
-  }, [unlock])
 
   const playFallbackBeep = useCallback((volume: number) => {
     const ctx = audioContextRef.current
