@@ -25,7 +25,7 @@ export function EventList({ events, isLoading, onSilence }: EventListProps) {
       <div className="rounded-xl border border-border bg-bg-card p-8 text-center">
         <p className="text-lg font-semibold text-accent-green">Agenda limpa!</p>
         <p className="mt-1 text-sm text-text-muted">
-          Próximas 24h sem reuniões.
+          Sem reuniões para hoje.
         </p>
       </div>
     )

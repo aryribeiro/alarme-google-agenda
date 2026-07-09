@@ -9,13 +9,13 @@ import {
   resetAdminConfig,
   hashPassword,
 } from '@/lib/adminAuth'
-import { useAlarmAudio } from '@/hooks/useAlarmAudio'
+import { useAlarmState } from '@/hooks/useAlarmState'
 
 export function AdminPanel() {
   const [config, setConfig] = useState<AdminConfig>(DEFAULT_CONFIG)
   const [newPassword, setNewPassword] = useState('')
   const [saved, setSaved] = useState(false)
-  const { play, stop, unlock, isUnlocked } = useAlarmAudio()
+  const { playAlarm: play, stopAlarm: stop, unlockAudio: unlock, isAudioUnlocked: isUnlocked } = useAlarmState()
 
   useEffect(() => {
     setConfig(getAdminConfig())

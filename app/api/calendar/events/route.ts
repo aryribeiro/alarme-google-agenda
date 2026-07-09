@@ -2,29 +2,41 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { fetchUpcomingEvents } from '@/lib/googleCalendar'
+import { parseGoogleError } from '@/lib/googleErrors'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions)
 
     if (!session?.accessToken) {
       return NextResponse.json(
-        { error: 'Não autenticado' },
+        { error: 'Não autenticado', code: 'TOKEN_EXPIRED' },
         { status: 401 }
       )
     }
 
     if (session.error === 'RefreshAccessTokenError') {
       return NextResponse.json(
-        { error: 'Token expirado. Faça login novamente.' },
+        { error: 'Token expirado. Faça login novamente.', code: 'TOKEN_EXPIRED' },
         { status: 401 }
       )
     }
 
-    const events = await fetchUpcomingEvents(session.accessToken)
-    return NextResponse.json(events)
+    const { searchParams } = new URL(request.url)
+    const syncToken = searchParams.get('syncToken') || undefined
+
+    const result = await fetchUpcomingEvents(session.accessToken, syncToken)
+    return NextResponse.json(result)
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Erro interno'
-    return NextResponse.json({ error: message }, { status: 500 })
+    const parsed = parseGoogleError(err)
+    return NextResponse.json(
+      {
+        error: parsed.message,
+        code: parsed.code,
+        retryable: parsed.retryable,
+        retryAfterMs: parsed.retryAfterMs,
+      },
+      { status: parsed.status || 500 }
+    )
   }
 }

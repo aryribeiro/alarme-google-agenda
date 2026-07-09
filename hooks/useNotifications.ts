@@ -76,13 +76,5 @@ export function useNotifications() {
     }
   }, [permission])
 
-  const clearNotified = useCallback((eventId: string) => {
-    notifiedRef.current.forEach((key) => {
-      if (key.startsWith(eventId)) {
-        notifiedRef.current.delete(key)
-      }
-    })
-  }, [])
-
-  return { permission, requestPermission, sendNotification, clearNotified }
+  return { permission, requestPermission, sendNotification }
 }
