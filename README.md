@@ -1,4 +1,4 @@
-<p align="center"><img width="700" height="478" alt="print" src="https://github.com/user-attachments/assets/02f80453-9ef9-4f39-a18d-d0885890e72d" /></p>
+<p align="center"><img width="700" height="478" alt="print" src="https://github.com/user-attachments/assets/4b68186d-7013-4a78-965f-2017000592da" /></p>
 
 O web app **Alarme Google Agenda 2026** é um sistema de alarme impossível de ignorar, sincronizado com o Google Agenda (Calendar). Alarme sonoro, visual (overlay vermelho fullscreen) e push notifications para garantir que você nunca mais perca uma reunião.
 
