@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation'
 import { Header } from '@/components/Header'
 import { EventList } from '@/components/EventList'
 import { AlarmOverlay } from '@/components/AlarmOverlay'
-import { AudioUnlockBanner } from '@/components/AudioUnlockBanner'
 import { RoomsMenu } from '@/components/RoomsMenu'
 import { OnlineCounter } from '@/components/OnlineCounter'
 import { useAlarmState } from '@/hooks/useAlarmState'
@@ -28,7 +27,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen">
-      <AudioUnlockBanner />
       <AlarmOverlay />
       <Header lastSync={lastSync} onSyncNow={syncNow} isLoading={isLoading} />
 

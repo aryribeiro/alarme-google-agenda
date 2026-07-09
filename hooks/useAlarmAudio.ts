@@ -5,11 +5,6 @@ import type { AlarmLevel } from '@/types'
 import { getVolumeForLevel } from '@/lib/alarmLogic'
 import { getAdminConfig } from '@/lib/adminAuth'
 
-/**
- * Hook para controle do áudio do alarme.
- * Usa /som/som.mp3 como fonte principal, com fallback para Web Audio API (880Hz square wave).
- * O áudio só funciona após o usuário clicar no AudioUnlockBanner (restrição do browser).
- */
 export function useAlarmAudio() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
@@ -41,6 +36,7 @@ export function useAlarmAudio() {
   }, [])
 
   const unlock = useCallback(async () => {
+    if (isUnlockedRef.current) return
     try {
       const audio = audioRef.current
       if (audio) {
@@ -58,9 +54,21 @@ export function useAlarmAudio() {
       isUnlockedRef.current = true
       setIsUnlocked(true)
     } catch {
-      // Browser blocked audio — keep banner visible
+      // Browser blocked — will retry on next interaction
     }
   }, [])
+
+  useEffect(() => {
+    const tryUnlock = () => unlock()
+    document.addEventListener('click', tryUnlock, true)
+    document.addEventListener('touchstart', tryUnlock, true)
+    document.addEventListener('keydown', tryUnlock, true)
+    return () => {
+      document.removeEventListener('click', tryUnlock, true)
+      document.removeEventListener('touchstart', tryUnlock, true)
+      document.removeEventListener('keydown', tryUnlock, true)
+    }
+  }, [unlock])
 
   const playFallbackBeep = useCallback((volume: number) => {
     const ctx = audioContextRef.current
