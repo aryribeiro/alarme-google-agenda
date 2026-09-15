@@ -188,10 +188,38 @@ export function useCalendarPolling() {
 
   useEffect(() => {
     calculateAlarms()
+
+    let worker: Worker | null = null
+    try {
+      if (typeof window !== 'undefined' && 'Worker' in window) {
+        worker = new Worker('/timerWorker.js')
+        worker.onmessage = (e) => {
+          if (e.data?.type === 'TICK') {
+            calculateAlarms()
+          }
+        }
+        worker.postMessage('START')
+      }
+    } catch {
+      // Fallback para setInterval caso Workers sejam bloqueados
+    }
+
     countdownRef.current = setInterval(calculateAlarms, 1000)
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        calculateAlarms()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
 
     return () => {
       if (countdownRef.current) clearInterval(countdownRef.current)
+      if (worker) {
+        worker.postMessage('STOP')
+        worker.terminate()
+      }
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [calculateAlarms, state.events])
 

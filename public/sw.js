@@ -25,6 +25,9 @@ function fireNotification(alarm) {
     requireInteraction: true,
     renotify: true,
     silent: false,
+    actions: [
+      { action: 'open', title: 'Entrar na Reunião' }
+    ],
     data: { url: alarm.url },
   })
 }
@@ -94,6 +97,9 @@ self.addEventListener('message', (event) => {
         requireInteraction: true,
         renotify: true,
         silent: false,
+        actions: [
+          { action: 'open', title: 'Entrar na Reunião' }
+        ],
         data: { url },
       })
     )
