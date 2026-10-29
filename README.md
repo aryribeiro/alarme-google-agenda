@@ -24,7 +24,7 @@ O web app **Alarme Google Agenda 2026** é um sistema de alarme impossível de i
 
 | Camada | Tecnologia |
 |--------|-----------|
-| Framework | Next.js 14 (App Router) |
+| Framework | Next.js 16 (App Router) + React 19 |
 | Linguagem | TypeScript (strict mode) |
 | Autenticação | NextAuth.js v4 + Google OAuth 2.0 |
 | API | Google Calendar API v3 |
@@ -43,7 +43,7 @@ A logo não está incluída no repositório — cada instalação usa a sua.
 
 ## Pré-requisitos
 
-- Node.js 18+
+- Node.js 20.9+
 - Conta Google Cloud (a API é gratuita)
 - Vercel CLI (`npm i -g vercel`) ou conta na vercel.com
 
@@ -219,7 +219,16 @@ As salas são sincronizadas via API — nenhum link fica exposto no código font
 - Tokens com refresh automático (JWT strategy)
 - Nenhum dado armazenado em banco — tudo é buscado em tempo real da API do Google
 - Links de reunião sincronizados dinamicamente (nunca hardcoded)
-- Middleware protege rotas autenticadas
+- Proxy (antigo middleware) protege rotas autenticadas
+- Cabeçalhos de segurança: CSP, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy
+- Dependências sem vulnerabilidade conhecida (`npm audit` zerado em 29/10/2026)
+
+## Limites e proteções
+
+- **Leve no computador:** com o painel aberto, o app usa por volta de 12% de um núcleo do processador no Firefox. Durante o alarme sobe para cerca de 25%, e no "reunião agora" (tela vermelha pulsando) para cerca de 57% de um núcleo, só até você dispensar.
+- **Celular com a tela desligada:** depois de tocar em "Ativar Som", o app mantém um áudio inaudível tocando para o navegador não pausar a página. Funciona melhor no Android com o Chrome. No iPhone, o sistema pode pausar sites em segundo plano; para reunião importante, deixe a tela acesa com o botão "Manter tela acesa".
+- **Ao abrir o app perto da reunião:** o alarme toca assim que você toca na tela pela primeira vez (o navegador não permite som antes disso).
+- **Contador de pessoas online:** é aproximado, porque cada servidor da Vercel conta separadamente.
 
 ## Desenvolvimento local
 
