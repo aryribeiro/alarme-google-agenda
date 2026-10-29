@@ -45,6 +45,14 @@ export function getVolumeForLevel(level: AlarmLevel, config: AdminConfig = DEFAU
 }
 
 /**
+ * Data (YYYY-MM-DD) no horário de Brasília (UTC-3, sem horário de verão).
+ * toISOString() puro vira o dia às 21h BRT.
+ */
+export function getBrtDateString(now: number = Date.now()): string {
+  return new Date(now - 3 * 60 * 60 * 1000).toISOString().split('T')[0]
+}
+
+/**
  * Verifica se um evento foi silenciado hoje.
  */
 export function isEventSilencedToday(eventId: string): boolean {
@@ -54,7 +62,7 @@ export function isEventSilencedToday(eventId: string): boolean {
 
   try {
     const data = JSON.parse(stored) as { date: string; events: string[] }
-    const today = new Date().toISOString().split('T')[0]
+    const today = getBrtDateString()
     if (data.date !== today) {
       localStorage.removeItem('alarme-silenced-events')
       return false
@@ -70,7 +78,7 @@ export function isEventSilencedToday(eventId: string): boolean {
  */
 export function silenceEvent(eventId: string): void {
   if (typeof window === 'undefined') return
-  const today = new Date().toISOString().split('T')[0]
+  const today = getBrtDateString()
   const stored = localStorage.getItem('alarme-silenced-events')
 
   let data: { date: string; events: string[] } = { date: today, events: [] }

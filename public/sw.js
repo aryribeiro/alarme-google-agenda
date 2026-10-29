@@ -45,7 +45,9 @@ async function processAlarms() {
       for (const alarm of scheduledAlarms) {
         if (now >= alarm.fireAt) {
           fireNotification(alarm)
-          if (alarm.level === 'critical' || alarm.level === 'maximum') {
+          const isUrgent = alarm.level === 'critical' || alarm.level === 'maximum'
+          // Prazo final: sem ele, a página fechada deixava o alarme repetindo para sempre
+          if (isUrgent && now + 30000 < (alarm.until || 0)) {
             toAdd.push({ ...alarm, fireAt: now + 30000 })
           }
         } else {
@@ -64,19 +66,10 @@ async function processAlarms() {
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SCHEDULE_ALARMS') {
+    // O laço em andamento já lê a lista nova; só inicia um se não houver
     scheduledAlarms = event.data.alarms || []
-    if (scheduledAlarms.length > 0) {
-      if (!loopActive) {
-        event.waitUntil(processAlarms())
-      } else {
-        event.waitUntil(
-          new Promise((resolve) => {
-            const check = setInterval(() => {
-              if (!loopActive) { clearInterval(check); resolve() }
-            }, 5000)
-          })
-        )
-      }
+    if (scheduledAlarms.length > 0 && !loopActive) {
+      event.waitUntil(processAlarms())
     }
     return
   }

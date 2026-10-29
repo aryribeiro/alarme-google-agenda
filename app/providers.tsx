@@ -40,7 +40,7 @@ function AlarmProvider({ children }: { children: React.ReactNode }) {
 
         const now = Date.now()
         const config = getAdminConfig()
-        const schedule: Array<{ fireAt: number; title: string; body: string; tag: string; level: string; url: string }> = []
+        const schedule: Array<{ fireAt: number; title: string; body: string; tag: string; level: string; url: string; until: number }> = []
 
         for (const event of polling.events) {
           if (isEventSilencedToday(event.id)) continue
@@ -62,9 +62,9 @@ function AlarmProvider({ children }: { children: React.ReactNode }) {
             const isUrgent = level === 'critical' || level === 'maximum'
 
             if (fireAt > now && fireAt < now + 35 * 60000) {
-              schedule.push({ fireAt, title: `${emoji} ${prefix}: ${event.summary}`, body, tag: event.id, level, url })
+              schedule.push({ fireAt, title: `${emoji} ${prefix}: ${event.summary}`, body, tag: event.id, level, url, until: startTime + 30 * 60000 })
             } else if (isUrgent && fireAt <= now && startTime > now - 30 * 60000) {
-              schedule.push({ fireAt: now + 30000, title: `${emoji} ${prefix}: ${event.summary}`, body, tag: event.id, level, url })
+              schedule.push({ fireAt: now + 30000, title: `${emoji} ${prefix}: ${event.summary}`, body, tag: event.id, level, url, until: startTime + 30 * 60000 })
             }
           }
         }

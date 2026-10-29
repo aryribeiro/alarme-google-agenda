@@ -8,7 +8,7 @@ export function AudioUnlockBanner() {
   if (isAudioUnlocked) return null
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9998] border-b border-accent-orange/40 bg-accent-orange/95 px-4 py-2.5 text-center shadow-lg backdrop-blur-md">
+    <div className="fixed top-0 left-0 right-0 z-[9998] border-b border-accent-orange/40 bg-accent-orange px-4 py-2.5 text-center shadow-lg">
       <div className="mx-auto flex max-w-4xl flex-col items-center justify-between gap-2 sm:flex-row">
         <div className="flex items-center gap-2 text-left">
           <span className="text-xl">🔔</span>

@@ -105,7 +105,6 @@ export function EventCard({ event, onSilence }: EventCardProps) {
               strokeLinecap="round"
               strokeDasharray={circumference}
               strokeDashoffset={dashOffset}
-              className="transition-all duration-1000"
             />
           </svg>
           <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-text-primary" style={{ fontVariantNumeric: 'tabular-nums' }}>

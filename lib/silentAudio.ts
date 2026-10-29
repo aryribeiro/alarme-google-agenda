@@ -1,9 +1,10 @@
 // Gerador de áudio silencioso e gerenciamento de MediaSession para manter
 // o ciclo de vida do áudio ativo no iOS Safari e Android Chrome com a tela desligada.
 
-// WAV mínimo de 1 segundo de silêncio (PCM 8kHz 8-bit mono) codificado em base64
-const SILENT_WAV_BASE64 =
-  'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA'
+// MP3 de 10 s com ruído a −80 dB: inaudível, mas não é silêncio digital.
+// O Chrome Android só mantém em 2º plano mídia com 5 s ou mais, e silêncio
+// absoluto não conta como áudio tocando (a aba volta a ser estrangulada).
+const SILENT_AUDIO_SRC = '/som/silencio.mp3'
 
 class SilentAudioController {
   private audio: HTMLAudioElement | null = null
@@ -12,9 +13,9 @@ class SilentAudioController {
   public init() {
     if (typeof window === 'undefined' || this.audio) return
     try {
-      const audio = new Audio(SILENT_WAV_BASE64)
+      const audio = new Audio(SILENT_AUDIO_SRC)
       audio.loop = true
-      audio.volume = 0.001 // Inaudível, mantendo hardware e thread de áudio ativos
+      // Volume cheio: o próprio arquivo já é inaudível; volume quase zero vira silêncio para o navegador
       audio.preload = 'auto'
       this.audio = audio
     } catch (err) {

@@ -38,7 +38,7 @@ export function Header({ lastSync, onSyncNow, isLoading }: HeaderProps) {
     : null
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-bg-primary/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 border-b border-border bg-bg-primary">
       <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           <img src="/som/logo.png" alt="Logo" className="h-7 w-auto" />
@@ -54,7 +54,7 @@ export function Header({ lastSync, onSyncNow, isLoading }: HeaderProps) {
 
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-2 sm:flex">
-            <span className="h-2 w-2 rounded-full bg-accent-green animate-pulse" />
+            <span className="h-2 w-2 rounded-full bg-accent-green" />
             <span className="text-xs text-text-muted">
               {timeSinceSync !== null
                 ? timeSinceSync === 0

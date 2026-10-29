@@ -13,7 +13,7 @@ O web app **Alarme Google Agenda 2026** é um sistema de alarme impossível de i
 - **Salas de reunião** — menu hambúrguer com salas sincronizadas do Google Calendar (eventos "SALA INTERNA")
 - **Contador de presença** — ícone de olho mostrando quantos colegas estão online
 - **Botão de teste** — simula alarme completo (som + visual) para validar que tudo funciona
-- **Silenciar/Snooze** — silenciar evento individual ou adiar por 5 minutos
+- **Silenciar/Snooze** — silenciar evento individual ou lembrar de novo em 2 minutos
 - **Wake Lock** — impede o Chrome mobile de recarregar a tab em segundo plano
 - **Auto-recovery do áudio** — após reload, reativa o som automaticamente sem intervenção
 - **Painel admin** — configuração de intervalos, volume, frequência do fallback (protegido por senha)

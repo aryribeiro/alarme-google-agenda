@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CalendarEvent, AlarmLevel, SyncResult } from '@/types'
-import { calculateAlarmLevel, getMinutesUntilEvent, isEventSilencedToday, silenceEvent as silenceEventInStorage } from '@/lib/alarmLogic'
+import { calculateAlarmLevel, getBrtDateString, getMinutesUntilEvent, isEventSilencedToday, silenceEvent as silenceEventInStorage } from '@/lib/alarmLogic'
 import { getAdminConfig } from '@/lib/adminAuth'
 import type { ActiveAlarm } from './useAlarmState'
 
@@ -14,9 +14,11 @@ interface PollingState {
   error: string | null
 }
 
-function getBrtDateString(now: number): string {
-  const brt = new Date(now - 3 * 60 * 60 * 1000)
-  return brt.toISOString().split('T')[0]
+const WATCH_STORAGE_KEY = 'alarme-watch-channel'
+
+function sameAlarms(a: ActiveAlarm[], b: ActiveAlarm[]): boolean {
+  if (a.length !== b.length) return false
+  return a.every((alarm, i) => alarm.event === b[i].event && alarm.level === b[i].level)
 }
 
 function isEventToday(event: CalendarEvent, todayBrt: string): boolean {
@@ -157,6 +159,8 @@ export function useCalendarPolling() {
         return order[a.level] - order[b.level]
       })
 
+      // Sem mudança, devolve o mesmo estado: evita re-render da árvore inteira a cada segundo
+      if (sameAlarms(prev.activeAlarms, alarms)) return prev
       return { ...prev, activeAlarms: alarms }
     })
   }, [])
@@ -188,7 +192,9 @@ export function useCalendarPolling() {
 
   useEffect(() => {
     calculateAlarms()
+  }, [calculateAlarms, state.events])
 
+  useEffect(() => {
     let worker: Worker | null = null
     try {
       if (typeof window !== 'undefined' && 'Worker' in window) {
@@ -201,10 +207,11 @@ export function useCalendarPolling() {
         worker.postMessage('START')
       }
     } catch {
-      // Fallback para setInterval caso Workers sejam bloqueados
+      worker = null
     }
 
-    countdownRef.current = setInterval(calculateAlarms, 1000)
+    // Fallback para setInterval caso Workers sejam bloqueados
+    if (!worker) countdownRef.current = setInterval(calculateAlarms, 1000)
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -221,13 +228,31 @@ export function useCalendarPolling() {
       }
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [calculateAlarms, state.events])
+  }, [calculateAlarms])
 
   useEffect(() => {
+    // Reaproveita o canal enquanto não expira: um canal novo a cada abertura da página acumulava no Google
     async function registerWatch() {
       try {
+        const stored = localStorage.getItem(WATCH_STORAGE_KEY)
+        if (stored) {
+          const { expiration } = JSON.parse(stored) as { expiration: string }
+          if (Number(expiration) - Date.now() > 60 * 60 * 1000) {
+            watchActiveRef.current = true
+            return
+          }
+        }
+      } catch {}
+
+      try {
         const res = await fetch('/api/calendar/watch', { method: 'POST' })
-        if (res.ok) watchActiveRef.current = true
+        if (res.ok) {
+          const data = await res.json()
+          try {
+            localStorage.setItem(WATCH_STORAGE_KEY, JSON.stringify(data))
+          } catch {}
+          watchActiveRef.current = true
+        }
       } catch {}
     }
     registerWatch()

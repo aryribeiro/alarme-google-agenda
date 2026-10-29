@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AlarmLevel, CalendarEvent } from '@/types'
+import { getAdminConfig } from '@/lib/adminAuth'
 
 export function useNotifications() {
   const [permission, setPermission] = useState<NotificationPermission>('default')
@@ -41,13 +42,14 @@ export function useNotifications() {
     if (notifiedRef.current.has(notifKey)) return
     notifiedRef.current.add(notifKey)
 
+    const config = getAdminConfig()
     const title = level === 'maximum'
       ? `🚨 REUNIÃO AGORA: ${event.summary}`
       : level === 'critical'
-        ? `⚠️ Em 5 min: ${event.summary}`
+        ? `⚠️ Em ${config.criticalMinutes} min: ${event.summary}`
         : level === 'urgent'
-          ? `🔔 Em 10 min: ${event.summary}`
-          : `📅 Em 30 min: ${event.summary}`
+          ? `🔔 Em ${config.urgentMinutes} min: ${event.summary}`
+          : `📅 Em ${config.warningMinutes} min: ${event.summary}`
 
     const startTime = new Date(event.start).toLocaleTimeString('pt-BR', {
       hour: '2-digit',

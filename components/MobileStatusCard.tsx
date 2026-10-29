@@ -16,13 +16,13 @@ export function MobileStatusCard() {
   }
 
   return (
-    <div className="mb-4 rounded-xl border border-border/60 bg-bg-card/70 p-3.5 backdrop-blur-sm shadow-sm transition-all">
+    <div className="mb-4 rounded-xl border border-border/60 bg-bg-card p-3.5 shadow-sm">
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between text-xs">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1.5">
             <span
               className={`h-2 w-2 rounded-full ${
-                isAudioUnlocked ? 'bg-accent-green shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-accent-orange animate-pulse'
+                isAudioUnlocked ? 'bg-accent-green shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-accent-orange'
               }`}
             />
             <span className="font-semibold text-text-primary">
