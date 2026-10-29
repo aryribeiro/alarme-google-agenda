@@ -39,7 +39,9 @@ module.exports = {
       },
       animation: {
         'pulse-red': 'pulse-red 0.8s ease-in-out infinite',
-        'ring-danger': 'ring-danger 1s ease-in-out infinite',
+        // steps(1): pisca liga/desliga em vez de esmaecer; a transição suave redesenhava a tela
+        // a cada quadro e levava a GPU do Firefox a ~96% com o alarme ativo (medido 29/10/2026)
+        'ring-danger': 'ring-danger 1s steps(1, end) infinite',
       },
     },
   },

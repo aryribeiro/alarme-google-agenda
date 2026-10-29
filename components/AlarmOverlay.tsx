@@ -5,7 +5,7 @@ import { useAlarmState } from '@/hooks/useAlarmState'
 import { AlarmControls } from './AlarmControls'
 
 export function AlarmOverlay() {
-  const { activeAlarms, silenceEvent, snoozeEvent, playAlarm, stopAlarm, isTestActive, dismissTest } = useAlarmState()
+  const { activeAlarms, silenceEvent, snoozeEvent, playAlarm, stopAlarm, isTestActive, dismissTest, isAudioUnlocked } = useAlarmState()
   const lastAlarmIdRef = useRef<string | null>(null)
 
   const criticalAlarm = activeAlarms.find(
@@ -14,6 +14,9 @@ export function AlarmOverlay() {
 
   useEffect(() => {
     if (criticalAlarm) {
+      // Só marca como tocado depois do desbloqueio: antes disso o play() é ignorado pelo navegador
+      // e o alarme aberto antes do primeiro toque (reload no celular) ficava mudo para sempre
+      if (!isAudioUnlocked) return
       const alarmKey = `${criticalAlarm.event.id}-${criticalAlarm.level}`
       if (lastAlarmIdRef.current !== alarmKey) {
         lastAlarmIdRef.current = alarmKey
@@ -23,7 +26,7 @@ export function AlarmOverlay() {
       stopAlarm()
       lastAlarmIdRef.current = null
     }
-  }, [criticalAlarm, playAlarm, stopAlarm, isTestActive])
+  }, [criticalAlarm, playAlarm, stopAlarm, isTestActive, isAudioUnlocked])
 
   const handleDismiss = (eventId: string) => {
     stopAlarm()
