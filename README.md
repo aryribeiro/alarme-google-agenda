@@ -14,7 +14,6 @@ O web app **Alarme Google Agenda 2026** é um sistema de alarme impossível de i
 - **Contador de presença** — ícone de olho mostrando quantos colegas estão online
 - **Botão de teste** — simula alarme completo (som + visual) para validar que tudo funciona
 - **Silenciar/Snooze** — silenciar evento individual ou lembrar de novo em 2 minutos
-- **Wake Lock** — impede o Chrome mobile de recarregar a tab em segundo plano
 - **Auto-recovery do áudio** — após reload, reativa o som automaticamente sem intervenção
 - **Painel admin** — configuração de intervalos, volume, frequência do fallback (protegido por senha)
 - **Tema dark** — interface escura otimizada para uso contínuo
@@ -181,7 +180,6 @@ https://seu-app.vercel.app no campo sobre JavaScript...
 │   ├── useAlarmState.ts          # Context type + provider hook
 │   ├── useCalendarPolling.ts     # Polling + cálculo de alarmes
 │   ├── useNotifications.ts       # Push notifications via Service Worker
-│   └── useWakeLock.ts            # Wake Lock API (previne tab discard no mobile)
 ├── lib/
 │   ├── adminAuth.ts              # Autenticação admin (SHA-256 local)
 │   ├── alarmLogic.ts             # Lógica de níveis e timing
@@ -226,7 +224,7 @@ As salas são sincronizadas via API — nenhum link fica exposto no código font
 ## Limites e proteções
 
 - **Leve no computador:** com o painel aberto, o app usa por volta de 12% de um núcleo do processador no Firefox. Durante o alarme sobe para cerca de 25%, e no "reunião agora" (tela vermelha pulsando) para cerca de 57% de um núcleo, só até você dispensar.
-- **Celular com a tela desligada:** depois de tocar em "Ativar Som", o app mantém um áudio inaudível tocando para o navegador não pausar a página. Funciona melhor no Android com o Chrome. No iPhone, o sistema pode pausar sites em segundo plano; para reunião importante, deixe a tela acesa com o botão "Manter tela acesa".
+- **Celular com a tela desligada:** depois de tocar em "Ativar Som", o app mantém um áudio inaudível tocando para o navegador não pausar a página. Funciona melhor no Android com o Chrome. No iPhone, o sistema pode pausar sites em segundo plano.
 - **Ao abrir o app perto da reunião:** o alarme toca assim que você toca na tela pela primeira vez (o navegador não permite som antes disso).
 - **Contador de pessoas online:** é aproximado, porque cada servidor da Vercel conta separadamente.
 
