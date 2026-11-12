@@ -6,7 +6,7 @@ O web app **Alarme Google Agenda 2026** é um sistema de alarme impossível de i
 
 - **Alarme sonoro** — toca MP3 em loop com fallback Web Audio API (880Hz square wave)
 - **Alarme visual** — overlay vermelho fullscreen em níveis critical/maximum
-- **Push notifications** — via Service Worker, funciona com tela bloqueada no smartphone
+- **Aviso no celular com a tela apagada** — um vigia no servidor acompanha a agenda e envia a notificação na hora (Web Push), mesmo com o navegador fechado
 - **Vibração** — padrão de vibração no mobile quando o alarme dispara
 - **Sincronização automática** — polling a cada 2 min (configurável), busca todos os eventos do dia
 - **Links de reunião** — detecta Google Meet, Zoom, Teams, Webex, Chime, AWS Events e outros
@@ -161,6 +161,8 @@ https://seu-app.vercel.app no campo sobre JavaScript...
 │   │   ├── auth/[...nextauth]/   # NextAuth endpoints
 │   │   ├── calendar/events/      # Busca eventos do dia
 │   │   ├── calendar/rooms/       # Busca salas de reunião
+│   │   ├── calendar/webhook/     # Aviso de mudança do Google (acorda o vigia)
+│   │   ├── push/                 # hello (registra o aparelho), silence, unsubscribe
 │   │   └── presence/             # Heartbeat de presença online
 │   ├── admin/                    # Painel administrativo
 │   ├── login/                    # Tela de login
@@ -179,15 +181,20 @@ https://seu-app.vercel.app no campo sobre JavaScript...
 │   ├── useAlarmAudio.ts          # Controle de áudio (MP3 + Web Audio fallback)
 │   ├── useAlarmState.ts          # Context type + provider hook
 │   ├── useCalendarPolling.ts     # Polling + cálculo de alarmes
-│   ├── useNotifications.ts       # Push notifications via Service Worker
+│   └── useNotifications.ts       # Notificações + registro do aparelho para push
 ├── lib/
 │   ├── adminAuth.ts              # Autenticação admin (SHA-256 local)
 │   ├── alarmLogic.ts             # Lógica de níveis e timing
 │   ├── auth.ts                   # NextAuth config (Google provider + JWT refresh)
-│   └── googleCalendar.ts         # Integração Google Calendar API v3
+│   ├── calendarFilter.ts         # O que merece alarme (ignora recusado, cancelado, fora do escritório)
+│   ├── googleCalendar.ts         # Integração Google Calendar API v3
+│   ├── pushPlan.ts               # Regra pura do vigia: o que disparar e quando acordar
+│   └── vigia*.ts                 # Bordas do vigia: Google, push, chaves, tique
+├── workflows/
+│   └── vigia.ts                  # Vigia de push (Vercel Workflows): um por usuário
 ├── public/
-│   ├── som/                      # som.mp3 (alarme) + logo.png
-│   └── sw.js                     # Service Worker para push notifications
+│   ├── som/                      # som.mp3 (alarme) + silencio.mp3 + logo.png
+│   └── sw.js                     # Service Worker: recebe o push e mostra a notificação
 └── types/
     └── index.ts                  # Interfaces TypeScript
 ```
@@ -215,16 +222,22 @@ As salas são sincronizadas via API — nenhum link fica exposto no código font
 
 - Somente leitura do calendário (scope `calendar.readonly`)
 - Tokens com refresh automático (JWT strategy)
-- Nenhum dado armazenado em banco — tudo é buscado em tempo real da API do Google
+- Sem banco de dados próprio — os eventos são buscados em tempo real da API do Google
+- O vigia de push guarda, no Vercel Workflows, só o necessário para avisar com o app fechado: a credencial de leitura da agenda (cifrada com AES-256-GCM) e o endereço de push de cada aparelho
+- Ao sair da conta, o aparelho é removido do vigia; sem aparelhos, ou após 30 dias sem abrir o app, o vigia se encerra
 - Links de reunião sincronizados dinamicamente (nunca hardcoded)
 - Proxy (antigo middleware) protege rotas autenticadas
 - Cabeçalhos de segurança: CSP, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy
-- Dependências sem vulnerabilidade conhecida (`npm audit` zerado em 29/10/2026)
+- Dependências sem vulnerabilidade conhecida (`npm audit` zerado em 12/11/2026)
 
 ## Limites e proteções
 
 - **Leve no computador:** com o painel aberto, o app usa por volta de 12% de um núcleo do processador no Firefox. Durante o alarme sobe para cerca de 25%, e no "reunião agora" (tela vermelha pulsando) para cerca de 57% de um núcleo, só até você dispensar.
-- **Celular com a tela desligada:** depois de tocar em "Ativar Som", o app mantém um áudio inaudível tocando para o navegador não pausar a página. Funciona melhor no Android com o Chrome. No iPhone, o sistema pode pausar sites em segundo plano.
+- **Celular com a tela apagada:** o aviso chega como notificação do sistema (som e vibração do próprio aparelho), 5 minutos antes e no horário da reunião, este último repetido 3 vezes. Para ativar: abra o app no celular, entre com o Google e aceite as notificações. No **iPhone** é preciso antes adicionar o app à Tela de Início (Compartilhar → Adicionar à Tela de Início) e abrir por esse ícone; exige iOS 16.4 ou mais novo.
+- **O que a notificação não faz:** tocar a sirene do app. Com a tela apagada o navegador não deixa um site tocar som próprio; quem toca é o som de notificação do celular. A sirene e a tela vermelha continuam valendo com o app aberto.
+- **Mudanças na agenda:** reunião criada, movida ou cancelada no Google chega ao vigia em segundos. Como rede de segurança, ele também relê a agenda a cada 3 horas.
+- **Se o Google revogar o acesso:** o vigia envia uma notificação "Avisos de reunião pausados" pedindo novo login, em vez de parar calado.
+- **Capacidade:** o plano gratuito da Vercel inclui 50 mil eventos de Workflows por mês; pela estimativa de projeto, cada pessoa com cerca de 4 reuniões por dia consome por volta de 3 mil, o que dá para umas 15 pessoas (ainda não medido em produção).
 - **Ao abrir o app perto da reunião:** o alarme toca assim que você toca na tela pela primeira vez (o navegador não permite som antes disso).
 - **Contador de pessoas online:** é aproximado, porque cada servidor da Vercel conta separadamente.
 

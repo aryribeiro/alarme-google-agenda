@@ -13,3 +13,6 @@ print.png
 print2.png
 *.zip
 tsconfig.tsbuildinfo
+/.swc
+
+coverage

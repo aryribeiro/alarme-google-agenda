@@ -3,6 +3,7 @@
 import { signIn, useSession } from 'next-auth/react'
 import { redirect } from 'next/navigation'
 import { useState } from 'react'
+import { forgetPushHello } from '@/hooks/useNotifications'
 
 export default function LoginPage() {
   const { status } = useSession()
@@ -14,6 +15,8 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     setIsLoading(true)
+    // Login novo traz credencial nova: o próximo carregamento reapresenta o aparelho ao servidor
+    forgetPushHello()
     signIn('google', { callbackUrl: '/' })
   }
 

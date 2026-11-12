@@ -14,8 +14,6 @@ interface PollingState {
   error: string | null
 }
 
-const WATCH_STORAGE_KEY = 'alarme-watch-channel'
-
 function sameAlarms(a: ActiveAlarm[], b: ActiveAlarm[]): boolean {
   if (a.length !== b.length) return false
   return a.every((alarm, i) => alarm.event === b[i].event && alarm.level === b[i].level)
@@ -38,12 +36,10 @@ export function useCalendarPolling() {
 
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const webhookRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const snoozedRef = useRef<Map<string, number>>(new Map())
   const syncTokenRef = useRef<string | null>(null)
   const eventsMapRef = useRef<Map<string, CalendarEvent>>(new Map())
   const lastSyncDateRef = useRef<string>('')
-  const watchActiveRef = useRef(false)
 
   const fetchEvents = useCallback(async () => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }))
@@ -229,52 +225,6 @@ export function useCalendarPolling() {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [calculateAlarms])
-
-  useEffect(() => {
-    // Reaproveita o canal enquanto não expira: um canal novo a cada abertura da página acumulava no Google
-    async function registerWatch() {
-      try {
-        const stored = localStorage.getItem(WATCH_STORAGE_KEY)
-        if (stored) {
-          const { expiration } = JSON.parse(stored) as { expiration: string }
-          if (Number(expiration) - Date.now() > 60 * 60 * 1000) {
-            watchActiveRef.current = true
-            return
-          }
-        }
-      } catch {}
-
-      try {
-        const res = await fetch('/api/calendar/watch', { method: 'POST' })
-        if (res.ok) {
-          const data = await res.json()
-          try {
-            localStorage.setItem(WATCH_STORAGE_KEY, JSON.stringify(data))
-          } catch {}
-          watchActiveRef.current = true
-        }
-      } catch {}
-    }
-    registerWatch()
-  }, [])
-
-  useEffect(() => {
-    const checkWebhook = async () => {
-      if (!watchActiveRef.current) return
-      try {
-        const res = await fetch('/api/calendar/webhook')
-        if (res.ok) {
-          const { changed } = await res.json()
-          if (changed) fetchEvents()
-        }
-      } catch {}
-    }
-
-    webhookRef.current = setInterval(checkWebhook, 15000)
-    return () => {
-      if (webhookRef.current) clearInterval(webhookRef.current)
-    }
-  }, [fetchEvents])
 
   return {
     ...state,

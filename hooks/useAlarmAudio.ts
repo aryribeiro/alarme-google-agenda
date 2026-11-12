@@ -13,7 +13,6 @@ export function useAlarmAudio() {
   const isUnlockedRef = useRef(false)
   const useFallbackRef = useRef(false)
   const [isUnlocked, setIsUnlocked] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(() => {
     const audio = new Audio('/som/som.mp3')
@@ -127,8 +126,6 @@ export function useAlarmAudio() {
       })
     }
 
-    setIsPlaying(true)
-
     if (config.vibrationEnabled && navigator.vibrate) {
       navigator.vibrate([200, 100, 200, 100, 200])
     }
@@ -151,8 +148,7 @@ export function useAlarmAudio() {
     }
 
     silentAudio.resume()
-    setIsPlaying(false)
   }, [])
 
-  return { isUnlocked, unlock, play, stop, isPlaying }
+  return { isUnlocked, unlock, play, stop }
 }

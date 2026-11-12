@@ -1,12 +1,6 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-})
 
 export const metadata: Metadata = {
   title: 'Alarme Google Agenda 2026',
@@ -30,14 +24,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR" className={inter.variable}>
-      <head>
-        <meta name="theme-color" content="#0A0A0F" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/som/logo.png" />
-      </head>
+    <html lang="pt-BR">
       <body className="min-h-screen font-sans antialiased">
         <Providers>{children}</Providers>
       </body>

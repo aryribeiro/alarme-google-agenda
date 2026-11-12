@@ -21,10 +21,10 @@ export interface AlarmContextType {
   unlockAudio: () => Promise<void>
   playAlarm: (level: AlarmLevel) => void
   stopAlarm: () => void
-  isPlaying: boolean
   testAlarm: () => void
   dismissTest: () => void
   isTestActive: boolean
+  disablePush: () => Promise<void>
 }
 
 export const AlarmContext = createContext<AlarmContextType>({
@@ -40,10 +40,10 @@ export const AlarmContext = createContext<AlarmContextType>({
   unlockAudio: async () => {},
   playAlarm: () => {},
   stopAlarm: () => {},
-  isPlaying: false,
   testAlarm: () => {},
   dismissTest: () => {},
   isTestActive: false,
+  disablePush: async () => {},
 })
 
 export function useAlarmState() {

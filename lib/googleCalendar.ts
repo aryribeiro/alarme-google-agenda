@@ -1,6 +1,7 @@
 import { google } from 'googleapis'
 import type { CalendarEvent, Room, SyncResult } from '@/types'
 import { parseGoogleError, withRetry } from './googleErrors'
+import { isAlarmableEvent } from './calendarFilter'
 
 function extractExternalLink(description?: string | null, location?: string | null): string | undefined {
   const text = [description, location].filter(Boolean).join(' ')
@@ -64,7 +65,8 @@ export async function fetchUpcomingEvents(
           })
 
           for (const item of response.data.items || []) {
-            if (item.status === 'cancelled') {
+            // Cancelado, recusado ou que deixou de ser reunião: sai da lista do cliente
+            if (!isAlarmableEvent(item)) {
               if (item.id) cancelledIds.push(item.id)
               continue
             }
@@ -113,8 +115,7 @@ export async function fetchUpcomingEvents(
       })
 
       for (const item of response.data.items || []) {
-        if (!item.start?.dateTime) continue
-        if (item.status === 'cancelled') continue
+        if (!isAlarmableEvent(item)) continue
         const ev = toCalendarEvent(item)
         if (ev) events.push(ev)
       }
@@ -183,46 +184,5 @@ export async function fetchRooms(accessToken: string): Promise<Room[]> {
     unique.forEach((room) => result.push(room))
     result.sort((a, b) => a.name.localeCompare(b.name))
     return result
-  })
-}
-
-export async function watchCalendar(
-  accessToken: string,
-  webhookUrl: string,
-  userToken: string
-): Promise<{ channelId: string; resourceId: string; expiration: string }> {
-  const auth = new google.auth.OAuth2()
-  auth.setCredentials({ access_token: accessToken })
-  const calendar = google.calendar({ version: 'v3', auth })
-
-  const response = await calendar.events.watch({
-    calendarId: 'primary',
-    requestBody: {
-      id: crypto.randomUUID(),
-      type: 'web_hook',
-      address: webhookUrl,
-      token: userToken,
-      params: { ttl: '86400' },
-    },
-  })
-
-  return {
-    channelId: response.data.id!,
-    resourceId: response.data.resourceId!,
-    expiration: response.data.expiration!,
-  }
-}
-
-export async function stopWatchChannel(
-  accessToken: string,
-  channelId: string,
-  resourceId: string
-): Promise<void> {
-  const auth = new google.auth.OAuth2()
-  auth.setCredentials({ access_token: accessToken })
-  const calendar = google.calendar({ version: 'v3', auth })
-
-  await calendar.channels.stop({
-    requestBody: { id: channelId, resourceId },
   })
 }

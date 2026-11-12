@@ -2,23 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --color-bg-primary: #0A0A0F;
-  --color-bg-card: #13131A;
-  --color-bg-elevated: #1C1C28;
-  --color-accent-red: #E53935;
-  --color-accent-red-bright: #FF1744;
-  --color-accent-orange: #F57C00;
-  --color-accent-yellow: #F9A825;
-  --color-accent-green: #00C853;
-  --color-text-primary: #F5F5F5;
-  --color-text-muted: #9E9E9E;
-  --color-border: #2A2A3A;
-}
-
 body {
-  background-color: var(--color-bg-primary);
-  color: var(--color-text-primary);
+  background-color: #0A0A0F;
+  color: #F5F5F5;
 }
 
 ::-webkit-scrollbar {

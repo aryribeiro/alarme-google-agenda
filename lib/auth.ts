@@ -48,6 +48,8 @@ export const authOptions: NextAuthOptions = {
           if (refreshed.refresh_token) {
             token.refreshToken = refreshed.refresh_token
           }
+          // Uma falha passageira anterior não pode deixar a sessão marcada como expirada para sempre
+          delete token.error
         } catch {
           token.error = 'RefreshAccessTokenError'
         }

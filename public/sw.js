@@ -1,4 +1,4 @@
-self.addEventListener('install', (event) => {
+self.addEventListener('install', () => {
   self.skipWaiting()
 })
 
@@ -6,17 +6,13 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim())
 })
 
-// --- Pre-scheduled alarms (background reliability) ---
-
-let scheduledAlarms = []
-let loopActive = false
-
-function fireNotification(alarm) {
+// A etiqueta é a reunião: um aviso novo substitui o anterior da mesma reunião em vez de empilhar
+function showAlarm(alarm) {
   const isUrgent = alarm.level === 'critical' || alarm.level === 'maximum'
 
-  self.registration.showNotification(alarm.title, {
-    body: alarm.body,
-    tag: isUrgent ? `${alarm.tag}-${Date.now()}` : alarm.tag,
+  return self.registration.showNotification(alarm.title || 'Alarme Google Agenda', {
+    body: alarm.body || '',
+    tag: alarm.tag || 'alarme',
     icon: '/som/logo.png',
     badge: '/som/logo.png',
     vibrate: isUrgent
@@ -28,74 +24,25 @@ function fireNotification(alarm) {
     actions: [
       { action: 'open', title: 'Entrar na Reunião' }
     ],
-    data: { url: alarm.url },
+    data: { url: alarm.url || '/' },
   })
 }
 
-async function processAlarms() {
-  loopActive = true
+// Aviso enviado pelo servidor (vigia): chega com a tela apagada e o navegador fechado
+self.addEventListener('push', (event) => {
+  let alarm = {}
   try {
-    while (scheduledAlarms.length > 0) {
-      await new Promise((r) => setTimeout(r, 10000))
-
-      const now = Date.now()
-      const remaining = []
-      const toAdd = []
-
-      for (const alarm of scheduledAlarms) {
-        if (now >= alarm.fireAt) {
-          fireNotification(alarm)
-          const isUrgent = alarm.level === 'critical' || alarm.level === 'maximum'
-          // Prazo final: sem ele, a página fechada deixava o alarme repetindo para sempre
-          if (isUrgent && now + 30000 < (alarm.until || 0)) {
-            toAdd.push({ ...alarm, fireAt: now + 30000 })
-          }
-        } else {
-          remaining.push(alarm)
-        }
-      }
-
-      scheduledAlarms = [...remaining, ...toAdd]
-    }
-  } finally {
-    loopActive = false
+    alarm = event.data ? event.data.json() : {}
+  } catch {
+    // corpo ilegível: ainda assim mostra um aviso genérico (o navegador exige notificação a cada push)
   }
-}
+  event.waitUntil(showAlarm(alarm))
+})
 
-// --- Message handler ---
-
+// Aviso pedido pela página aberta
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SCHEDULE_ALARMS') {
-    // O laço em andamento já lê a lista nova; só inicia um se não houver
-    scheduledAlarms = event.data.alarms || []
-    if (scheduledAlarms.length > 0 && !loopActive) {
-      event.waitUntil(processAlarms())
-    }
-    return
-  }
-
   if (event.data && event.data.type === 'ALARM') {
-    const { title, body, tag, url, level } = event.data
-    const isUrgent = level === 'critical' || level === 'maximum'
-
-    event.waitUntil(
-      self.registration.showNotification(title, {
-        body,
-        tag: isUrgent ? `${tag}-${Date.now()}` : tag,
-        icon: '/som/logo.png',
-        badge: '/som/logo.png',
-        vibrate: isUrgent
-          ? [300, 100, 300, 100, 300, 100, 300, 100, 300]
-          : [200, 100, 200, 100, 200],
-        requireInteraction: true,
-        renotify: true,
-        silent: false,
-        actions: [
-          { action: 'open', title: 'Entrar na Reunião' }
-        ],
-        data: { url },
-      })
-    )
+    event.waitUntil(showAlarm(event.data))
   }
 })
 
@@ -103,9 +50,12 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close()
 
   const url = event.notification.data?.url || '/'
+  const isMeetingLink = /^https?:\/\//.test(url) && !url.startsWith(self.location.origin)
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      // Link de reunião abre direto; sem link, volta para o app
+      if (isMeetingLink) return self.clients.openWindow(url)
       for (const client of clients) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
           return client.focus()
