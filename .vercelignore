@@ -1,0 +1,4 @@
+android
+.github
+*.test.ts
+coverage

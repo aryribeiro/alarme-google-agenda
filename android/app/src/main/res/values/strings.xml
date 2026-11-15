@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Alarme Agenda</string>
+    <string name="resumo">Toca como despertador antes e na hora de cada reunião da sua agenda, mesmo com a tela apagada.</string>
+    <string name="tudo_pronto">✓ Tudo pronto. O alarme vai tocar.</string>
+    <string name="falta_permitir">Falta permitir para o alarme tocar:</string>
+
+    <string name="exp_agenda">Para saber os horários das suas reuniões, o app lê a agenda deste aparelho. Nada sai do celular.</string>
+    <string name="btn_agenda">Permitir ler a agenda</string>
+    <string name="exp_notificacoes">O alarme aparece como aviso na tela. Sem isso ele não consegue se mostrar.</string>
+    <string name="btn_notificacoes">Permitir avisos</string>
+    <string name="exp_alarme_exato">Para tocar no minuto certo, como o despertador.</string>
+    <string name="btn_alarme_exato">Permitir alarmes na hora exata</string>
+    <string name="exp_tela_cheia">Para a tela vermelha aparecer por cima do bloqueio.</string>
+    <string name="btn_tela_cheia">Permitir tela cheia</string>
+    <string name="exp_bateria">Alguns aparelhos desligam apps para poupar bateria e o alarme deixa de tocar.</string>
+    <string name="btn_bateria">Não restringir a bateria</string>
+
+    <string name="proximos_alarmes">Próximos alarmes</string>
+    <string name="sem_reunioes">Nenhuma reunião com horário marcado nas próximas 24 horas.</string>
+    <string name="sem_permissao_agenda">Permita ler a agenda para ver as reuniões.</string>
+    <string name="toca_as">toca às %1$s</string>
+    <string name="avisar_antes">Avisar quanto tempo antes</string>
+    <string name="n_min">%1$d min</string>
+    <string name="agendas">Agendas que disparam alarme</string>
+    <string name="testar_alarme">Testar o alarme agora</string>
+    <string name="teste_titulo">Teste do alarme</string>
+    <string name="rodape">por Ary Ribeiro</string>
+
+    <string name="reuniao_agora">REUNIÃO AGORA: %1$s</string>
+    <string name="reuniao_em">Em %1$d min: %2$s</string>
+    <string name="lembrete">Lembrete: %1$s</string>
+    <string name="entrar_na_reuniao">Entrar na reunião</string>
+    <string name="lembrar_2_min">Lembrar em 2 min</string>
+    <string name="parar">Parar</string>
+    <string name="alarme_perdido">Alarme perdido</string>
+    <string name="canal_nome">Alarmes de reunião</string>
+    <string name="canal_descricao">Toca antes e na hora de cada reunião da agenda.</string>
+</resources>

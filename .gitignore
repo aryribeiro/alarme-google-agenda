@@ -16,3 +16,11 @@ tsconfig.tsbuildinfo
 /.swc
 
 coverage
+
+# Android
+android/.gradle
+android/build
+android/app/build
+android/local.properties
+*.p12
+*.jks
