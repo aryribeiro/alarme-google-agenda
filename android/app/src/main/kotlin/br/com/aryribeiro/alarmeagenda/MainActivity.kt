@@ -94,7 +94,8 @@ class MainActivity : Activity() {
 
     private fun entrada(): View {
         val coluna = Ui.coluna(this, 24).apply { gravity = Gravity.CENTER_HORIZONTAL }
-        coluna.addView(Ui.comMargem(this, logo(64), 48, largo = false))
+        // Logo com 64 dp de altura, como na tela de login do site (sem comMargem, que trocaria a altura)
+        coluna.addView(logo(64).apply { (layoutParams as LinearLayout.LayoutParams).topMargin = Ui.dp(this@MainActivity, 48) })
         coluna.addView(Ui.comMargem(this, Ui.centralizado(Ui.texto(this, getString(R.string.titulo_site), 24f, negrito = true)), 16))
         coluna.addView(Ui.comMargem(this, selo(), 10, largo = false))
         coluna.addView(Ui.comMargem(this, Ui.centralizado(Ui.texto(this, getString(R.string.slogan), 14f, Ui.APAGADO)), 28))
