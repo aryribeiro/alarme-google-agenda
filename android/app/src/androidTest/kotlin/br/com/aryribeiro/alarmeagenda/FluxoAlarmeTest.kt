@@ -46,6 +46,8 @@ class FluxoAlarmeTest {
     fun preparar() {
         // Endereço que recusa conexão: a busca falha sem desconectar e sem tocar a produção
         Api.servidor = "https://127.0.0.1:9"
+        // O emulador lento do CI mostra "app não está respondendo" do próprio sistema por cima das telas
+        shell("settings put global hide_error_dialogs 1")
         shell("dumpsys deviceidle unforce")
         shell("dumpsys battery reset")
         shell("input keyevent KEYCODE_WAKEUP")
@@ -266,6 +268,7 @@ class FluxoAlarmeTest {
     /** Print da tela para conferir a aparência (o CI publica como artefato). */
     private fun fotografar(nome: String) {
         instr.waitForIdleSync()
+        shell("am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS")
         Thread.sleep(1_500)
         shell("screencap -p /data/local/tmp/$nome.png")
     }

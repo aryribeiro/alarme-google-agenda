@@ -8,6 +8,10 @@ export interface AppSession {
   refreshToken: string
 }
 
+export interface AppSessionLida extends AppSession {
+  emitidoEm: number
+}
+
 export class TokenAppInvalido extends Error {
   constructor() {
     super('token do app inválido')
@@ -15,8 +19,15 @@ export class TokenAppInvalido extends Error {
   }
 }
 
-const VERSAO = 1
+const VERSAO = 2
 const DESAFIO = /^[A-Za-z0-9_-]{43}$/
+const DIA = 24 * 60 * 60 * 1000
+// Sem banco não há lista de revogação: a credencial expira sozinha se ficar 30 dias sem uso.
+// Em uso, o servidor emite uma nova no máximo uma vez por dia. Revogação imediata: tirar o acesso
+// do app na conta Google (vale para tudo) ou trocar o NEXTAUTH_SECRET (derruba todas as credenciais).
+const VALIDADE_MS = 30 * DIA
+const RENOVAR_APOS_MS = DIA
+const FOLGA_RELOGIO_MS = 5 * 60 * 1000
 
 function paraUrl(base64: string): string {
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
@@ -36,17 +47,23 @@ export function desafioValido(valor: unknown): valor is string {
   return typeof valor === 'string' && DESAFIO.test(valor)
 }
 
-export function criarTokenApp(sessao: AppSession, desafio: string, secret: string): string {
-  const conteudo = JSON.stringify({ v: VERSAO, e: sessao.email, rt: sessao.refreshToken, c: desafio })
+export function criarTokenApp(sessao: AppSession, desafio: string, secret: string, agora: number = Date.now()): string {
+  const conteudo = JSON.stringify({ v: VERSAO, e: sessao.email, rt: sessao.refreshToken, c: desafio, t: agora })
   return paraUrl(encryptSecret(conteudo, secret))
 }
 
-export function lerTokenApp(token: string, verificador: string, secret: string): AppSession {
+export function lerTokenApp(token: string, verificador: string, secret: string, agora: number = Date.now()): AppSessionLida {
   try {
-    const dados = JSON.parse(decryptSecret(deUrl(token), secret)) as { v?: number; e?: string; rt?: string; c?: string }
-    if (dados.v !== VERSAO || !dados.e || !dados.rt || dados.c !== desafioDe(verificador)) throw new TokenAppInvalido()
-    return { email: dados.e, refreshToken: dados.rt }
+    const dados = JSON.parse(decryptSecret(deUrl(token), secret)) as { v?: number; e?: string; rt?: string; c?: string; t?: number }
+    const valido = dados.v === VERSAO && !!dados.e && !!dados.rt && dados.c === desafioDe(verificador) &&
+      typeof dados.t === 'number' && dados.t <= agora + FOLGA_RELOGIO_MS && agora - dados.t <= VALIDADE_MS
+    if (!valido) throw new TokenAppInvalido()
+    return { email: dados.e as string, refreshToken: dados.rt as string, emitidoEm: dados.t as number }
   } catch {
     throw new TokenAppInvalido()
   }
+}
+
+export function precisaRenovar(emitidoEm: number, agora: number = Date.now()): boolean {
+  return agora - emitidoEm >= RENOVAR_APOS_MS
 }

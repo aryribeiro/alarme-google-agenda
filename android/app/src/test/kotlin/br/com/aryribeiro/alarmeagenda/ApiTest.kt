@@ -1,6 +1,7 @@
 package br.com.aryribeiro.alarmeagenda
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -35,6 +36,13 @@ class ApiTest {
         assertEquals("", dados.conta)
         assertEquals(listOf(Reuniao("x", 5, "(Sem título)", null, 5)), dados.reunioes)
         assertTrue(dados.salas.isEmpty())
+        assertNull(dados.tokenNovo)
+    }
+
+    @Test
+    fun `credencial renovada pelo servidor vem junto`() {
+        assertEquals("NovoToken_abc-123", Api.ler("""{"eventos":[],"token":"NovoToken_abc-123"}""").tokenNovo)
+        assertNull(Api.ler("""{"eventos":[],"token":""}""").tokenNovo)
     }
 
     @Test

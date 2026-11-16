@@ -40,6 +40,8 @@ object Atualizacao {
         val verificador = Prefs.verificador(c) ?: return false
         return when (val r = Api.buscar(token, verificador)) {
             is Api.Resultado.Ok -> {
+                // Credencial renovada pelo servidor: troca, mantendo o verificador deste aparelho
+                runCatching { Api.ler(r.json).tokenNovo }.getOrNull()?.let { Prefs.conectar(c, it, verificador) }
                 Prefs.salvarDados(c, r.json, System.currentTimeMillis())
                 AlarmScheduler.sincronizar(c)
                 true

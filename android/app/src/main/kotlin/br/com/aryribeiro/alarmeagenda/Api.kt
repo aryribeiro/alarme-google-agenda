@@ -7,7 +7,8 @@ import java.net.URL
 
 data class Sala(val nome: String, val url: String)
 
-data class Dados(val conta: String, val reunioes: List<Reuniao>, val salas: List<Sala>)
+/** tokenNovo: credencial renovada pelo servidor (vem no máximo uma vez por dia). */
+data class Dados(val conta: String, val reunioes: List<Reuniao>, val salas: List<Sala>, val tokenNovo: String? = null)
 
 /** Conversa com o mesmo servidor do site: as reuniões vêm da conta Google da empresa, não do celular. */
 object Api {
@@ -67,6 +68,6 @@ object Api {
             val url = s.optString("url").takeIf { it.isNotBlank() } ?: return@mapNotNull null
             Sala(s.optString("nome"), url)
         }
-        return Dados(raiz.optString("conta"), reunioes, salas)
+        return Dados(raiz.optString("conta"), reunioes, salas, raiz.optString("token").takeIf { it.isNotEmpty() })
     }
 }

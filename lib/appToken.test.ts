@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { criarTokenApp, desafioDe, desafioValido, lerTokenApp, TokenAppInvalido } from './appToken'
+import { criarTokenApp, desafioDe, desafioValido, lerTokenApp, precisaRenovar, TokenAppInvalido } from './appToken'
 
 const SEGREDO = 'segredo-de-teste-1'
 const VERIFICADOR = 'v'.repeat(20) + 'erificador-aleatorio-do-app-123'
@@ -16,7 +16,7 @@ describe('token do app', () => {
 
   it('ida e volta com o verificador certo devolve a conta', () => {
     const token = criarTokenApp(sessao, desafioDe(VERIFICADOR), SEGREDO)
-    expect(lerTokenApp(token, VERIFICADOR, SEGREDO)).toEqual(sessao)
+    expect(lerTokenApp(token, VERIFICADOR, SEGREDO)).toMatchObject(sessao)
   })
 
   it('o token vai em URL: só caracteres seguros e sem a credencial em claro', () => {
@@ -29,6 +29,26 @@ describe('token do app', () => {
   it('quem interceptar o token sem o verificador não usa', () => {
     const token = criarTokenApp(sessao, desafioDe(VERIFICADOR), SEGREDO)
     expect(() => lerTokenApp(token, 'outro-verificador-qualquer-de-tamanho-ok', SEGREDO)).toThrow(TokenAppInvalido)
+  })
+
+  it('vale por 30 dias desde a emissão; depois expira', () => {
+    const emitido = Date.UTC(2026, 10, 16)
+    const DIA = 24 * 60 * 60 * 1000
+    const token = criarTokenApp(sessao, desafioDe(VERIFICADOR), SEGREDO, emitido)
+    expect(lerTokenApp(token, VERIFICADOR, SEGREDO, emitido + 30 * DIA)).toEqual({ ...sessao, emitidoEm: emitido })
+    expect(() => lerTokenApp(token, VERIFICADOR, SEGREDO, emitido + 30 * DIA + 1)).toThrow(TokenAppInvalido)
+  })
+
+  it('recusa token emitido no futuro', () => {
+    const agora = Date.UTC(2026, 10, 16)
+    const token = criarTokenApp(sessao, desafioDe(VERIFICADOR), SEGREDO, agora + 10 * 60 * 1000)
+    expect(() => lerTokenApp(token, VERIFICADOR, SEGREDO, agora)).toThrow(TokenAppInvalido)
+  })
+
+  it('renova no máximo uma vez por dia', () => {
+    const DIA = 24 * 60 * 60 * 1000
+    expect(precisaRenovar(1000, 1000 + DIA - 1)).toBe(false)
+    expect(precisaRenovar(1000, 1000 + DIA)).toBe(true)
   })
 
   it('recusa token de outro servidor, adulterado ou lixo', () => {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { lerTokenApp, TokenAppInvalido } from '@/lib/appToken'
+import { criarTokenApp, desafioDe, lerTokenApp, precisaRenovar, TokenAppInvalido } from '@/lib/appToken'
 import { fetchRooms } from '@/lib/googleCalendar'
 import { InvalidGrantError, listAppEvents, refreshAccessToken } from '@/lib/vigiaGoogle'
 
@@ -27,8 +27,10 @@ export async function GET(request: Request) {
       listAppEvents(accessToken, Date.now()),
       fetchRooms(accessToken).catch(() => []),
     ])
+    // Credencial em uso ganha validade nova (no máximo uma vez por dia); a sem uso expira em 30 dias
+    const tokenNovo = precisaRenovar(sessao.emitidoEm) ? criarTokenApp(sessao, desafioDe(verificador), secret) : undefined
     return NextResponse.json(
-      { conta: sessao.email, eventos, salas: salas.map((s) => ({ nome: s.name, url: s.url })) },
+      { conta: sessao.email, eventos, salas: salas.map((s) => ({ nome: s.name, url: s.url })), token: tokenNovo },
       { headers: SEM_CACHE },
     )
   } catch (error) {
