@@ -232,15 +232,19 @@ As salas são sincronizadas via API — nenhum link fica exposto no código font
 
 ## App Android (alarme com a tela apagada)
 
-No celular Android o web app mostra o botão **Baixar o app para Android**. O app:
+**No celular, use o app; no computador, o site.** Aberto no navegador do celular, o site mostra só uma página de informação (sem login e sem reuniões) com os botões **Abrir o app** e **Baixar o app para Android**.
 
-- lê a agenda do próprio aparelho (a mesma que o Google Agenda mostra), sem servidor e sem login;
+O app:
+
+- entra com Google **igual ao site, com a mesma conta da empresa**, e mostra as mesmas reuniões;
+- tem a mesma aparência do site, com o selo **App Android** no cabeçalho para não confundir;
 - toca como despertador, em loop, 5 minutos antes (ou 10 ou 15) e na hora de cada reunião, com tela vermelha por cima do bloqueio e os botões **Entrar na reunião**, **Lembrar em 2 min** e **Parar**;
-- ignora eventos de dia inteiro, cancelados e recusados; reagenda quando a agenda muda e quando o celular reinicia.
+- busca as reuniões a cada 10 minutos, inclusive com a tela apagada; o alarme toca com a última lista mesmo sem internet;
+- se o acesso ao Google for revogado, avisa "Alarmes de reunião pausados" em vez de parar calado.
 
-**Instalar:** toque em *Baixar o app para Android*, abra o arquivo baixado, permita *instalar apps desta fonte* se o celular pedir, e toque em *Instalar*. No app, toque em cada botão laranja até aparecer *Tudo pronto* e use *Testar o alarme agora*.
+**Instalar:** no celular, abra o site, toque em *Baixar o app para Android*, abra o arquivo baixado, permita *instalar apps desta fonte* se o celular pedir e toque em *Instalar*. No app, toque em *Entrar com Google* (conta da empresa), depois em cada botão laranja até sumirem, e use *Teste* para ouvir o alarme.
 
-**Como é feito:** pasta `android/` (Kotlin, sem bibliotecas no app). O GitHub Actions (`.github/workflows/android.yml`) roda os testes de regra e 8 testes num emulador Android 14 (inclusive com a tela apagada e o aparelho em economia de bateria) e, no `master`, publica o APK assinado na release `android`. A chave de assinatura fica fora do repositório; perder a chave obriga quem instalou a desinstalar para atualizar.
+**Como é feito:** pasta `android/` (Kotlin, sem bibliotecas no app). O app fala só com o servidor do site (`/api/app/eventos`); o login passa por `/app/entrar` e `/api/app/conectar`, que devolve ao app uma credencial cifrada presa a um verificador que nunca sai do aparelho (expira em 30 dias sem uso e se renova sozinha em uso). O GitHub Actions roda os testes de regra e 11 testes num emulador Android 14 (incluindo tela apagada e economia de bateria, login e a tela) e, no `master`, publica o APK assinado na release `android`. A chave de assinatura fica fora do repositório.
 
 ## Limites e proteções
 
