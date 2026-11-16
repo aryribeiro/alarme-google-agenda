@@ -26,7 +26,7 @@ object AlarmScheduler {
 
     fun proximo(c: Context, agora: Long): Ponto? =
         AlarmPlanner.proximo(
-            reunioes = CalendarReader.reunioes(c, agora),
+            reunioes = Prefs.reunioes(c),
             agora = agora,
             tocados = Prefs.tocados(c),
             dispensadas = Prefs.dispensadas(c),
@@ -37,7 +37,7 @@ object AlarmScheduler {
     private fun intentDisparo(c: Context, ponto: Ponto?): PendingIntent {
         val intent = Intent(c, AlarmReceiver::class.java).setAction(ACAO_DISPARAR)
         if (ponto != null) {
-            intent.putExtra(EXTRA_EVENT_ID, ponto.reuniao.eventId)
+            intent.putExtra(EXTRA_EVENT_ID, ponto.reuniao.id)
             intent.putExtra(EXTRA_INICIO, ponto.reuniao.inicio)
             intent.putExtra(EXTRA_TIPO, ponto.tipo.name)
         }

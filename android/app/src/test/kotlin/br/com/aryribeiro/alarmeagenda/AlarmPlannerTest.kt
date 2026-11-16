@@ -8,7 +8,7 @@ class AlarmPlannerTest {
     private val min = 60_000L
     private val hora = 60 * min
     private val inicio = 1_800_000_000_000L
-    private val daily = Reuniao(eventId = 7, inicio = inicio, titulo = "Daily", link = null)
+    private val daily = Reuniao(id = "7", inicio = inicio, titulo = "Daily", link = null)
 
     private fun proximo(
         agora: Long,
@@ -78,13 +78,13 @@ class AlarmPlannerTest {
 
     @Test
     fun `entre varias reunioes escolhe o toque mais proximo`() {
-        val review = Reuniao(8, inicio - 30 * min, "Review", null)
+        val review = Reuniao("8", inicio - 30 * min, "Review", null)
         assertEquals(review, proximo(inicio - hora, reunioes = listOf(daily, review))?.reuniao)
     }
 
     @Test
     fun `no mesmo instante reuniao agora vence aviso de antecedencia de outra`() {
-        val outra = Reuniao(9, inicio + 5 * min, "Outra", null)
+        val outra = Reuniao("9", inicio + 5 * min, "Outra", null)
         val tocados = setOf(AlarmPlanner.chaveDe(daily, Tipo.ANTES))
         val ponto = proximo(inicio - min, reunioes = listOf(outra, daily), tocados = tocados)
         // outra: ANTES em inicio; daily: AGORA em inicio
@@ -127,8 +127,8 @@ class AlarmPlannerTest {
 
     @Test
     fun `agenda lista os toques futuros em ordem e ignora dispensadas`() {
-        val review = Reuniao(8, inicio - 30 * min, "Review", null)
-        val fora = Reuniao(9, inicio + hora, "Fora", null)
+        val review = Reuniao("8", inicio - 30 * min, "Review", null)
+        val fora = Reuniao("9", inicio + hora, "Fora", null)
         val lista = AlarmPlanner.agenda(listOf(daily, fora, review), inicio - hora, emptySet(), setOf(fora.chave), 5)
         assertEquals(listOf(review, daily), lista.map { it.reuniao })
     }

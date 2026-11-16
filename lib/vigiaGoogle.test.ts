@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ensureWatchChannel, InvalidGrantError, listUpcomingEvents, refreshAccessToken } from './vigiaGoogle'
+import { ensureWatchChannel, InvalidGrantError, listAppEvents, listUpcomingEvents, refreshAccessToken } from './vigiaGoogle'
 
 const HOUR = 60 * 60 * 1000
 const NOW = Date.UTC(2026, 10, 12, 18, 0, 0)
@@ -110,5 +110,40 @@ describe('ensureWatchChannel', () => {
     const { fn, calls } = fakeFetch(() => criado)
     expect(await ensureWatchChannel({ ...base, address: 'http://localhost:3000/api/calendar/webhook', channel: null }, fn)).toBeNull()
     expect(calls).toHaveLength(0)
+  })
+})
+
+describe('listAppEvents', () => {
+  it('entrega ao app só o que merece alarme, com início, fim e o link da reunião', async () => {
+    const { fn, calls } = fakeFetch(() => ({
+      body: {
+        items: [
+          { id: 'meet', summary: 'Daily', start: { dateTime: '2026-11-12T15:00:00-03:00' }, end: { dateTime: '2026-11-12T15:30:00-03:00' }, hangoutLink: 'https://meet.google.com/abc' },
+          { id: 'zoom', summary: null, start: { dateTime: '2026-11-12T16:00:00-03:00' }, end: { dateTime: '2026-11-12T17:00:00-03:00' }, description: 'Pauta em https://docs.exemplo.com e sala https://us02web.zoom.us/j/123' },
+          { id: 'sem-fim', summary: 'Rápida', start: { dateTime: '2026-11-12T18:00:00-03:00' }, location: 'Sala 3' },
+          { id: 'cancelada', summary: 'X', status: 'cancelled', start: { dateTime: '2026-11-12T15:00:00-03:00' } },
+          { id: 'dia', summary: 'Feriado', start: { date: '2026-11-12' } },
+        ],
+      },
+    }))
+
+    const eventos = await listAppEvents('acesso', NOW, fn)
+
+    expect(eventos).toEqual([
+      { id: 'meet', titulo: 'Daily', inicio: Date.parse('2026-11-12T18:00:00Z'), fim: Date.parse('2026-11-12T18:30:00Z'), link: 'https://meet.google.com/abc' },
+      { id: 'zoom', titulo: '(Sem título)', inicio: Date.parse('2026-11-12T19:00:00Z'), fim: Date.parse('2026-11-12T20:00:00Z'), link: 'https://us02web.zoom.us/j/123' },
+      { id: 'sem-fim', titulo: 'Rápida', inicio: Date.parse('2026-11-12T21:00:00Z'), fim: Date.parse('2026-11-12T21:00:00Z'), link: null },
+    ])
+    expect(decodeURIComponent(calls[0].url)).toContain('end,')
+    expect(decodeURIComponent(calls[0].url)).toContain('description')
+  })
+
+  it('o vigia de push continua recebendo o mesmo formato de antes', async () => {
+    const { fn } = fakeFetch(() => ({
+      body: { items: [{ id: 'a', summary: 'A', start: { dateTime: '2026-11-12T15:00:00-03:00' }, end: { dateTime: '2026-11-12T16:00:00-03:00' }, description: 'https://zoom.us/j/1' }] },
+    }))
+    expect(await listUpcomingEvents('acesso', NOW, fn)).toEqual([
+      { id: 'a', summary: 'A', start: '2026-11-12T15:00:00-03:00', hangoutLink: undefined },
+    ])
   })
 })

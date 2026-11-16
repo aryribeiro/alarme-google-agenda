@@ -1,14 +1,15 @@
 package br.com.aryribeiro.alarmeagenda
 
-/** Reunião lida da agenda do aparelho. */
+/** Reunião da conta Google do site, entregue pelo servidor. */
 data class Reuniao(
-    val eventId: Long,
+    val id: String,
     val inicio: Long,
     val titulo: String,
     val link: String?,
+    val fim: Long = inicio,
 ) {
     /** O início entra na chave: reunião remarcada volta a tocar no horário novo. */
-    val chave: String get() = "$eventId|$inicio"
+    val chave: String get() = "$id|$inicio"
 }
 
 enum class Tipo { ANTES, AGORA, SONECA }

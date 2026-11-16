@@ -8,7 +8,6 @@ import { AlarmOverlay } from '@/components/AlarmOverlay'
 import { AudioUnlockBanner } from '@/components/AudioUnlockBanner'
 import { RoomsMenu } from '@/components/RoomsMenu'
 import { OnlineCounter } from '@/components/OnlineCounter'
-import { AndroidAppCard } from '@/components/AndroidAppCard'
 import { useAlarmState } from '@/hooks/useAlarmState'
 
 export default function DashboardPage() {
@@ -34,8 +33,6 @@ export default function DashboardPage() {
       <Header lastSync={lastSync} onSyncNow={syncNow} isLoading={isLoading} />
 
       <main className="mx-auto max-w-4xl px-4 py-6">
-        <AndroidAppCard />
-
         {error && (
           <div className="mb-4 rounded-lg border border-accent-red/30 bg-accent-red/10 px-4 py-3 text-sm text-accent-red">
             {error}

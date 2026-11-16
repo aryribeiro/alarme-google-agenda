@@ -4,7 +4,7 @@ name: Android
 # Ações de terceiros fixadas por commit (SHA): a chave de assinatura passa por aqui.
 on:
   push:
-    branches: [master, android-app]
+    branches: [master, android-app, app-conta]
     paths:
       - 'android/**'
       - '.github/workflows/android.yml'

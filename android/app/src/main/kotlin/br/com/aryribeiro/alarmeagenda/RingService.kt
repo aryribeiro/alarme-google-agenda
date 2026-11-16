@@ -215,7 +215,7 @@ class RingService : Service() {
 
         fun intent(c: Context, acao: String, reuniao: Reuniao, tipo: Tipo): Intent =
             Intent(c, RingService::class.java).setAction(acao)
-                .putExtra(EXTRA_EVENT_ID, reuniao.eventId)
+                .putExtra(EXTRA_EVENT_ID, reuniao.id)
                 .putExtra(EXTRA_INICIO, reuniao.inicio)
                 .putExtra(EXTRA_TITULO, reuniao.titulo)
                 .putExtra(EXTRA_LINK, reuniao.link)
@@ -224,7 +224,7 @@ class RingService : Service() {
         fun reuniaoDe(intent: Intent): Reuniao? {
             if (!intent.hasExtra(EXTRA_INICIO)) return null
             return Reuniao(
-                eventId = intent.getLongExtra(EXTRA_EVENT_ID, -1),
+                id = intent.getStringExtra(EXTRA_EVENT_ID) ?: "",
                 inicio = intent.getLongExtra(EXTRA_INICIO, 0),
                 titulo = intent.getStringExtra(EXTRA_TITULO) ?: "",
                 link = intent.getStringExtra(EXTRA_LINK),

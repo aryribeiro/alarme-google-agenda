@@ -1,32 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Alarme Agenda</string>
-    <string name="resumo">Toca como despertador antes e na hora de cada reunião da sua agenda, mesmo com a tela apagada.</string>
-    <string name="tudo_pronto">✓ Tudo pronto. O alarme vai tocar.</string>
-    <string name="falta_permitir">Falta permitir para o alarme tocar:</string>
+    <string name="titulo_site">Alarme Google Agenda 2026</string>
+    <string name="selo_app">App Android</string>
+    <string name="slogan">Nunca mais perca uma reunião. Alarme impossível de ignorar, sincronizado com seu Google Calendar, que toca mesmo com a tela apagada.</string>
+    <string name="entrar_com_google">Entrar com Google</string>
+    <string name="mesma_conta">Use a mesma conta da empresa que você usa no computador.</string>
+    <string name="so_leitura">Permissão necessária: somente leitura do calendário.</string>
+    <string name="conta_conectada">Conta conectada</string>
+    <string name="conta_falhou">Não foi possível conectar. Toque em Entrar com Google de novo.</string>
+    <string name="conta_x">Conta: %1$s</string>
+    <string name="reconectar_titulo">Alarmes de reunião pausados</string>
+    <string name="reconectar_texto">Abra o Alarme Agenda e entre de novo com o Google.</string>
 
-    <string name="exp_agenda">Para saber os horários das suas reuniões, o app lê a agenda deste aparelho. Nada sai do celular.</string>
-    <string name="btn_agenda">Permitir ler a agenda</string>
-    <string name="exp_notificacoes">O alarme aparece como aviso na tela. Sem isso ele não consegue se mostrar.</string>
-    <string name="btn_notificacoes">Permitir avisos</string>
-    <string name="exp_alarme_exato">Para tocar no minuto certo, como o despertador.</string>
-    <string name="btn_alarme_exato">Permitir alarmes na hora exata</string>
-    <string name="exp_tela_cheia">Para a tela vermelha aparecer por cima do bloqueio.</string>
-    <string name="btn_tela_cheia">Permitir tela cheia</string>
-    <string name="exp_bateria">Alguns aparelhos desligam apps para poupar bateria e o alarme deixa de tocar.</string>
-    <string name="btn_bateria">Não restringir a bateria</string>
+    <string name="aguardando">Aguardando…</string>
+    <string name="sincronizado_agora">Sincronizado agora</string>
+    <string name="ha_min">Há %1$d min</string>
+    <string name="sync">🔄 Sync</string>
+    <string name="teste">🔔 Teste</string>
+    <string name="sair">Sair</string>
+    <string name="sair_titulo">Sair da conta?</string>
+    <string name="sair_texto">Os alarmes deste celular param até você entrar de novo.</string>
+    <string name="cancelar">Cancelar</string>
 
-    <string name="proximos_alarmes">Próximos alarmes</string>
-    <string name="sem_reunioes">Nenhuma reunião com horário marcado nas próximas 24 horas.</string>
-    <string name="sem_permissao_agenda">Permita ler a agenda para ver as reuniões.</string>
-    <string name="toca_as">toca às %1$s</string>
-    <string name="avisar_antes">Avisar quanto tempo antes</string>
+    <string name="proximos_eventos">Próximos eventos</string>
+    <plurals name="n_eventos">
+        <item quantity="one">%1$d evento</item>
+        <item quantity="other">%1$d eventos</item>
+    </plurals>
+    <string name="carregando">Carregando…</string>
+    <string name="agenda_limpa">Agenda limpa!</string>
+    <string name="sem_reunioes_hoje">Sem reuniões para hoje.</string>
+    <string name="silenciar_evento">Silenciar este evento</string>
+    <string name="tocar_antes">Tocar antes da reunião</string>
     <string name="n_min">%1$d min</string>
-    <string name="agendas">Agendas que disparam alarme</string>
-    <string name="testar_alarme">Testar o alarme agora</string>
-    <string name="teste_titulo">Teste do alarme</string>
+    <string name="salas">Salas de Reunião</string>
+    <string name="nenhuma_sala">Nenhuma sala encontrada</string>
+    <string name="fechar">Fechar</string>
     <string name="rodape">por Ary Ribeiro</string>
 
+    <string name="falta_permitir">Falta permitir para o alarme tocar</string>
+    <string name="falta_permitir_explica">Toque em cada botão. Eles somem quando estiver tudo certo.</string>
+    <string name="btn_notificacoes">Permitir avisos</string>
+    <string name="btn_alarme_exato">Permitir alarmes na hora exata</string>
+    <string name="btn_tela_cheia">Permitir tela cheia por cima do bloqueio</string>
+    <string name="btn_bateria">Não restringir a bateria</string>
+
+    <string name="teste_titulo">Teste do alarme</string>
     <string name="reuniao_agora">REUNIÃO AGORA: %1$s</string>
     <string name="reuniao_em">Em %1$d min: %2$s</string>
     <string name="lembrete">Lembrete: %1$s</string>

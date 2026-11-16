@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Ler os horários das reuniões na agenda do próprio aparelho -->
-    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <!-- Buscar as reuniões da conta da empresa no mesmo servidor do site -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Mostrar o alarme (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Tocar na hora exata, como o despertador -->
@@ -31,10 +31,18 @@
 
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Volta do login do Google (conectado) e botão "Abrir o app" do site no celular (abrir) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="alarmeagenda" />
             </intent-filter>
         </activity>
 
@@ -52,13 +60,12 @@
             android:exported="false"
             android:foregroundServiceType="systemExempted" />
 
-        <service
-            android:name=".SyncJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <receiver
             android:name=".AlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".AtualizarReceiver"
             android:exported="false" />
 
         <receiver

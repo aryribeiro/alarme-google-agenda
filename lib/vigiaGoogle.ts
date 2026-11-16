@@ -1,6 +1,7 @@
 // Borda de rede do vigia com o Google (OAuth + Calendar API v3). Só servidor.
 // fetch injetável para teste; nada aqui decide alarme (isso é do pushPlan).
 import { isAlarmableEvent, type RawCalendarItem } from './calendarFilter'
+import { extractExternalLink } from './meetingLink'
 import type { PlanEvent } from './pushPlan'
 
 type FetchFn = typeof fetch
@@ -50,18 +51,32 @@ export async function refreshAccessToken(
 }
 
 interface RawListItem extends RawCalendarItem {
+  id?: string | null
   summary?: string | null
   hangoutLink?: string | null
+  description?: string | null
+  location?: string | null
+  end?: { dateTime?: string | null } | null
 }
 
-export async function listUpcomingEvents(accessToken: string, now: number, fetchFn: FetchFn = fetch): Promise<PlanEvent[]> {
+/** Reunião como o app Android recebe: horários em milissegundos e o link já escolhido. */
+export interface AppEvent {
+  id: string
+  titulo: string
+  inicio: number
+  fim: number
+  link: string | null
+}
+
+/** Reuniões com alarme nas próximas 24 h (e as que começaram há pouco), já filtradas. */
+async function listAlarmableItems(accessToken: string, now: number, fetchFn: FetchFn): Promise<RawListItem[]> {
   const params = new URLSearchParams({
     timeMin: new Date(now - LOOKBEHIND_MS).toISOString(),
     timeMax: new Date(now + LOOKAHEAD_MS).toISOString(),
     singleEvents: 'true',
     orderBy: 'startTime',
     maxResults: '100',
-    fields: 'items(id,summary,status,eventType,start,hangoutLink,attendees(self,responseStatus))',
+    fields: 'items(id,summary,status,eventType,start,end,hangoutLink,description,location,attendees(self,responseStatus))',
   })
   const response = await fetchFn(`${CALENDAR}/calendars/primary/events?${params}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -69,14 +84,30 @@ export async function listUpcomingEvents(accessToken: string, now: number, fetch
   if (!response.ok) throw new Error(`calendar ${response.status}`)
 
   const data = (await response.json()) as { items?: RawListItem[] }
-  return (data.items || [])
-    .filter((item) => item.id && isAlarmableEvent(item))
-    .map((item) => ({
+  return (data.items || []).filter((item) => item.id && isAlarmableEvent(item))
+}
+
+export async function listUpcomingEvents(accessToken: string, now: number, fetchFn: FetchFn = fetch): Promise<PlanEvent[]> {
+  return (await listAlarmableItems(accessToken, now, fetchFn)).map((item) => ({
+    id: item.id as string,
+    summary: item.summary || '(Sem título)',
+    start: item.start?.dateTime as string,
+    hangoutLink: item.hangoutLink || undefined,
+  }))
+}
+
+export async function listAppEvents(accessToken: string, now: number, fetchFn: FetchFn = fetch): Promise<AppEvent[]> {
+  return (await listAlarmableItems(accessToken, now, fetchFn)).map((item) => {
+    const inicio = Date.parse(item.start?.dateTime as string)
+    return {
       id: item.id as string,
-      summary: item.summary || '(Sem título)',
-      start: item.start?.dateTime as string,
-      hangoutLink: item.hangoutLink || undefined,
-    }))
+      titulo: item.summary || '(Sem título)',
+      inicio,
+      fim: item.end?.dateTime ? Date.parse(item.end.dateTime) : inicio,
+      // Mesma escolha do site: Meet primeiro, senão o link de reunião escrito no evento
+      link: item.hangoutLink || extractExternalLink(item.description, item.location) || null,
+    }
+  })
 }
 
 function channelIsFresh(channel: WatchChannel | null, now: number): channel is WatchChannel {

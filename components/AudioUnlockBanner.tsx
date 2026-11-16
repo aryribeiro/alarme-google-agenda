@@ -1,21 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useAlarmState } from '@/hooks/useAlarmState'
 
 export function AudioUnlockBanner() {
   const { isAudioUnlocked, unlockAudio } = useAlarmState()
-  const [isAndroid, setIsAndroid] = useState(false)
-
-  useEffect(() => {
-    setIsAndroid(/Android/i.test(navigator.userAgent))
-  }, [])
 
   if (isAudioUnlocked) return null
 
   return (
-    // No celular a faixa ocupa o seu espaço (fixa, cobria o topo da página); no PC continua fixa no topo
-    <div className="relative z-[9998] border-b border-accent-orange/40 bg-accent-orange px-4 py-2.5 text-center shadow-lg sm:fixed sm:top-0 sm:left-0 sm:right-0">
+    <div className="fixed top-0 left-0 right-0 z-[9998] border-b border-accent-orange/40 bg-accent-orange px-4 py-2.5 text-center shadow-lg">
       <div className="mx-auto flex max-w-4xl flex-col items-center justify-between gap-2 sm:flex-row">
         <div className="flex items-center gap-2 text-left">
           <span className="text-xl">🔔</span>
@@ -24,9 +17,7 @@ export function AudioUnlockBanner() {
               Ative o som do alarme para este dispositivo
             </p>
             <p className="text-[11px] text-bg-primary/80">
-              {isAndroid
-                ? 'Necessário para o alarme tocar com esta página aberta. Com a tela apagada, quem toca é o app Android.'
-                : 'Necessário para o alarme tocar em segundo plano e com a tela desligada no celular.'}
+              Necessário para o alarme tocar em segundo plano e com a tela desligada no celular.
             </p>
           </div>
         </div>

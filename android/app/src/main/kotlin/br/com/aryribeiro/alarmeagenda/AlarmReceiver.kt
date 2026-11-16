@@ -20,12 +20,12 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     /**
-     * Confere na agenda, na hora do toque, se a reunião ainda existe naquele horário.
+     * Confere na última lista do servidor, na hora do toque, se a reunião ainda existe naquele horário.
      * Cancelada, remarcada ou recusada depois do agendamento: não toca.
      */
     private fun pontoValido(c: Context, intent: Intent, agora: Long): Ponto? {
         val tipo = runCatching { Tipo.valueOf(intent.getStringExtra(AlarmScheduler.EXTRA_TIPO) ?: "") }.getOrNull() ?: return null
-        val eventId = intent.getLongExtra(AlarmScheduler.EXTRA_EVENT_ID, Long.MIN_VALUE)
+        val eventId = intent.getStringExtra(AlarmScheduler.EXTRA_EVENT_ID) ?: return null
         val inicio = intent.getLongExtra(AlarmScheduler.EXTRA_INICIO, Long.MIN_VALUE)
 
         if (tipo == Tipo.SONECA) {
@@ -34,7 +34,7 @@ class AlarmReceiver : BroadcastReceiver() {
             return soneca?.takeIf { it.reuniao.chave !in Prefs.dispensadas(c) }
         }
 
-        val reuniao = CalendarReader.reunioes(c, agora).firstOrNull { it.eventId == eventId && it.inicio == inicio } ?: return null
+        val reuniao = Prefs.reunioes(c).firstOrNull { it.id == eventId && it.inicio == inicio } ?: return null
         if (reuniao.chave in Prefs.dispensadas(c)) return null
         return Ponto(reuniao, tipo, agora)
     }
@@ -44,6 +44,7 @@ class AlarmReceiver : BroadcastReceiver() {
 class SistemaReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         AlarmScheduler.sincronizar(context)
-        SyncJobService.agendar(context)
+        // Busca a lista nova logo depois (e a cada 10 min a partir daí)
+        Atualizacao.agendar(context, emMs = 30_000)
     }
 }

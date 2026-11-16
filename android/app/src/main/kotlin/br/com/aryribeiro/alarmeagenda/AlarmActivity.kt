@@ -3,14 +3,12 @@ package br.com.aryribeiro.alarmeagenda
 import android.app.Activity
 import android.app.KeyguardManager
 import android.content.BroadcastReceiver
-import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.CalendarContract
 import android.view.Gravity
 import android.view.WindowManager
 import android.widget.LinearLayout
@@ -102,12 +100,10 @@ class AlarmActivity : Activity() {
         })
     }
 
-    private fun intentReuniao(r: Reuniao): Intent {
-        if (r.link != null) return Intent(Intent.ACTION_VIEW, Uri.parse(r.link))
-        // Sem link: abre o evento no app de agenda
-        return Intent(Intent.ACTION_VIEW, ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, r.eventId))
-            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, r.inicio)
-    }
+    // Sem link de reunião: abre a agenda do Google no navegador
+    private fun intentReuniao(r: Reuniao): Intent =
+        Intent(Intent.ACTION_VIEW, Uri.parse(r.link ?: "https://calendar.google.com/calendar/r"))
+
 
     companion object {
         fun intent(c: Context, reuniao: Reuniao, tipo: Tipo): Intent =

@@ -21,6 +21,20 @@ object Ui {
     val VERMELHO_ESCURO = Color.parseColor("#7F1D1D")
     val VERDE = Color.parseColor("#00C853")
     val LARANJA = Color.parseColor("#F57C00")
+    val BORDA = Color.parseColor("#2A2A3A")
+
+    /** Fundo arredondado com contorno de 1 dp (o "rounded-xl border" do site). */
+    fun fundoComBorda(c: Context, fundo: Int, borda: Int, raioDp: Int, soBaixo: Boolean = false): android.graphics.drawable.Drawable {
+        val forma = GradientDrawable().apply {
+            setColor(fundo)
+            cornerRadius = dp(c, raioDp).toFloat()
+            if (!soBaixo) setStroke(dp(c, 1), borda)
+        }
+        if (!soBaixo) return forma
+        // Só a linha de baixo, como o border-b do cabeçalho do site
+        val linha = GradientDrawable().apply { setColor(borda) }
+        return android.graphics.drawable.LayerDrawable(arrayOf(linha, forma)).apply { setLayerInset(1, 0, 0, 0, dp(c, 1)) }
+    }
 
     fun dp(c: Context, valor: Int): Int =
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valor.toFloat(), c.resources.displayMetrics).toInt()
