@@ -85,6 +85,7 @@ class FluxoAlarmeTest {
         shell("dumpsys deviceidle unforce")
         shell("dumpsys deviceidle disable")
         shell("dumpsys battery reset")
+        shell("svc power stayon true")
         shell("input keyevent KEYCODE_WAKEUP")
         limparAgenda()
         Prefs.limparTudo(c)
@@ -191,12 +192,17 @@ class FluxoAlarmeTest {
         AlarmScheduler.sincronizar(c)
         assertFalse(RingService.tocando != null)
 
+        val energia = c.getSystemService(PowerManager::class.java)
         shell("dumpsys battery unplug")
+        // O emulador do CI fica "sempre acordado": sem desligar isso a tela não apaga e o Doze para em INACTIVE
+        shell("svc power stayon false")
         shell("input keyevent KEYCODE_SLEEP")
+        assertTrue("a tela deve apagar", esperar(10_000) { !energia.isInteractive })
+
         // O emulador vem com o Doze desligado: liga antes de forçar (senão o teste não prova nada)
         shell("dumpsys deviceidle enable deep")
-        val resposta = shell("dumpsys deviceidle force-idle deep")
-        val energia = c.getSystemService(PowerManager::class.java)
+        var resposta = shell("dumpsys deviceidle force-idle deep")
+        repeat(6) { if (!energia.isDeviceIdleMode) resposta = shell("dumpsys deviceidle step deep") }
         assertTrue(
             "o aparelho deve estar em Doze durante a espera (resposta: ${resposta.trim()})",
             esperar(10_000) { energia.isDeviceIdleMode },
