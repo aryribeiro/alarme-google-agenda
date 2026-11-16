@@ -55,6 +55,7 @@ class FluxoAlarmeTest {
     @Before
     fun preparar() {
         shell("dumpsys deviceidle unforce")
+        shell("dumpsys deviceidle disable")
         shell("dumpsys battery reset")
         shell("input keyevent KEYCODE_WAKEUP")
         Prefs.limparTudo(c)
@@ -82,6 +83,7 @@ class FluxoAlarmeTest {
             esperar(5_000) { RingService.tocando == null }
         }
         shell("dumpsys deviceidle unforce")
+        shell("dumpsys deviceidle disable")
         shell("dumpsys battery reset")
         shell("input keyevent KEYCODE_WAKEUP")
         limparAgenda()
@@ -191,9 +193,14 @@ class FluxoAlarmeTest {
 
         shell("dumpsys battery unplug")
         shell("input keyevent KEYCODE_SLEEP")
-        shell("dumpsys deviceidle force-idle")
+        // O emulador vem com o Doze desligado: liga antes de forçar (senão o teste não prova nada)
+        shell("dumpsys deviceidle enable deep")
+        val resposta = shell("dumpsys deviceidle force-idle deep")
         val energia = c.getSystemService(PowerManager::class.java)
-        assertTrue("o aparelho deve estar em Doze durante a espera", esperar(10_000) { energia.isDeviceIdleMode })
+        assertTrue(
+            "o aparelho deve estar em Doze durante a espera (resposta: ${resposta.trim()})",
+            esperar(10_000) { energia.isDeviceIdleMode },
+        )
 
         assertTrue(
             "o alarme deve tocar mesmo em Doze, na hora marcada",
