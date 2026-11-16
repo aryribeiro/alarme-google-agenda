@@ -201,11 +201,10 @@ class FluxoAlarmeTest {
 
         // O emulador vem com o Doze desligado: liga antes de forçar (senão o teste não prova nada)
         shell("dumpsys deviceidle enable deep")
-        var resposta = shell("dumpsys deviceidle force-idle deep")
-        repeat(6) { if (!energia.isDeviceIdleMode) resposta = shell("dumpsys deviceidle step deep") }
+        val resposta = shell("dumpsys deviceidle force-idle deep")
         assertTrue(
             "o aparelho deve estar em Doze durante a espera (resposta: ${resposta.trim()})",
-            esperar(10_000) { energia.isDeviceIdleMode },
+            esperar(10_000) { shell("dumpsys deviceidle get deep").trim() == "IDLE" },
         )
 
         assertTrue(
