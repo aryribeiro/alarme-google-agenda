@@ -71,7 +71,9 @@ jobs:
           disable-animations: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           working-directory: android
-          script: gradle --no-daemon connectedDebugAndroidTest
+          script: |
+            gradle --no-daemon connectedDebugAndroidTest
+            mkdir -p app/build/telas && adb pull /data/local/tmp/tela-painel.png app/build/telas/ && adb pull /data/local/tmp/tela-entrada.png app/build/telas/ || true
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -79,6 +81,7 @@ jobs:
           path: |
             android/app/build/reports/androidTests/
             android/app/build/outputs/androidTest-results/
+            android/app/build/telas/
           if-no-files-found: ignore
 
   publicar:

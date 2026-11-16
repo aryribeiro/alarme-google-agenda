@@ -228,6 +228,7 @@ class FluxoAlarmeTest {
                 assertTrue("a reunião da conta aparece", "Daily do time" in textos)
                 assertTrue("a conta conectada aparece", "Conta: ana@empresa.com.br" in textos)
             }
+            fotografar("tela-painel")
         }
     }
 
@@ -240,6 +241,7 @@ class FluxoAlarmeTest {
                 assertTrue("tela de entrada: $textos", "Entrar com Google" in textos)
                 assertTrue("App Android" in textos)
             }
+            fotografar("tela-entrada")
         }
     }
 
@@ -259,6 +261,13 @@ class FluxoAlarmeTest {
         is TextView -> listOf(view.text.toString())
         is ViewGroup -> (0 until view.childCount).flatMap { textosDe(view.getChildAt(it)) }
         else -> emptyList()
+    }
+
+    /** Print da tela para conferir a aparência (o CI publica como artefato). */
+    private fun fotografar(nome: String) {
+        instr.waitForIdleSync()
+        Thread.sleep(1_500)
+        shell("screencap -p /data/local/tmp/$nome.png")
     }
 
     private fun apagarTela() {
