@@ -230,10 +230,23 @@ As salas são sincronizadas via API — nenhum link fica exposto no código font
 - Cabeçalhos de segurança: CSP, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy
 - Dependências sem vulnerabilidade conhecida (`npm audit` zerado em 12/11/2026)
 
+## App Android (alarme com a tela apagada)
+
+No celular Android o web app mostra o botão **Baixar o app para Android**. O app:
+
+- lê a agenda do próprio aparelho (a mesma que o Google Agenda mostra), sem servidor e sem login;
+- toca como despertador, em loop, 5 minutos antes (ou 10 ou 15) e na hora de cada reunião, com tela vermelha por cima do bloqueio e os botões **Entrar na reunião**, **Lembrar em 2 min** e **Parar**;
+- ignora eventos de dia inteiro, cancelados e recusados; reagenda quando a agenda muda e quando o celular reinicia.
+
+**Instalar:** toque em *Baixar o app para Android*, abra o arquivo baixado, permita *instalar apps desta fonte* se o celular pedir, e toque em *Instalar*. No app, toque em cada botão laranja até aparecer *Tudo pronto* e use *Testar o alarme agora*.
+
+**Como é feito:** pasta `android/` (Kotlin, sem bibliotecas no app). O GitHub Actions (`.github/workflows/android.yml`) roda os testes de regra e 8 testes num emulador Android 14 (inclusive com a tela apagada e o aparelho em economia de bateria) e, no `master`, publica o APK assinado na release `android`. A chave de assinatura fica fora do repositório; perder a chave obriga quem instalou a desinstalar para atualizar.
+
 ## Limites e proteções
 
 - **Leve no computador:** com o painel aberto, o app usa por volta de 12% de um núcleo do processador no Firefox. Durante o alarme sobe para cerca de 25%, e no "reunião agora" (tela vermelha pulsando) para cerca de 57% de um núcleo, só até você dispensar.
-- **Celular com a tela apagada:** o aviso chega como notificação do sistema (som e vibração do próprio aparelho), 5 minutos antes e no horário da reunião, este último repetido 3 vezes. Para ativar: abra o app no celular, entre com o Google e aceite as notificações. No **iPhone** é preciso antes adicionar o app à Tela de Início (Compartilhar → Adicionar à Tela de Início) e abrir por esse ícone; exige iOS 16.4 ou mais novo.
+- **Celular com a tela apagada (Android):** use o app Android (seção abaixo), que toca como despertador. O site sozinho, com a tela apagada, só consegue mandar uma notificação: o navegador não deixa um site tocar alarme.
+- **iPhone:** o site manda notificação com a tela apagada se for adicionado à Tela de Início (Compartilhar → Adicionar à Tela de Início, iOS 16.4 ou mais novo). Não há app para iPhone.
 - **O que a notificação não faz:** tocar a sirene do app. Com a tela apagada o navegador não deixa um site tocar som próprio; quem toca é o som de notificação do celular. A sirene e a tela vermelha continuam valendo com o app aberto.
 - **Mudanças na agenda:** reunião criada, movida ou cancelada no Google chega ao vigia em segundos. Como rede de segurança, ele também relê a agenda a cada 3 horas.
 - **Se o Google revogar o acesso:** o vigia envia uma notificação "Avisos de reunião pausados" pedindo novo login, em vez de parar calado.
