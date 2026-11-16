@@ -17,7 +17,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -185,34 +184,58 @@ class FluxoAlarmeTest {
     }
 
     @Test
-    fun toca_na_hora_com_a_tela_apagada_e_o_aparelho_em_economia_de_bateria() {
-        // Aviso de antecedência cai daqui a ~25 s
+    fun toca_na_hora_mesmo_com_o_aparelho_ja_em_doze_e_a_tela_apagada() {
+        // Sem nenhum alarme agendado o Android deixa entrar em Doze profundo
+        assertNull(AlarmScheduler.sincronizar(c))
+        entrarEmDoze()
+
+        // A reunião aparece com o aparelho já dormindo; o aviso de antecedência cai daqui a ~25 s
         val inicio = System.currentTimeMillis() + 5 * min + 25_000
         val id = criarReuniao("Tela apagada", inicio)
-        AlarmScheduler.sincronizar(c)
-        assertFalse(RingService.tocando != null)
-
-        val energia = c.getSystemService(PowerManager::class.java)
-        shell("dumpsys battery unplug")
-        // O emulador do CI fica "sempre acordado": sem desligar isso a tela não apaga e o Doze para em INACTIVE
-        shell("svc power stayon false")
-        shell("input keyevent KEYCODE_SLEEP")
-        assertTrue("a tela deve apagar", esperar(10_000) { !energia.isInteractive })
-
-        // O emulador vem com o Doze desligado: liga antes de forçar (senão o teste não prova nada)
-        shell("dumpsys deviceidle enable deep")
-        val resposta = shell("dumpsys deviceidle force-idle deep")
-        assertTrue(
-            "o aparelho deve estar em Doze durante a espera (resposta: ${resposta.trim()})",
-            esperar(10_000) { shell("dumpsys deviceidle get deep").trim() == "IDLE" },
-        )
+        assertNotNull(AlarmScheduler.sincronizar(c))
 
         assertTrue(
-            "o alarme deve tocar mesmo em Doze, na hora marcada",
+            "o alarme deve tocar com o aparelho em Doze e a tela apagada",
             esperar(60_000) { RingService.tocando == "$id|$inicio" },
         )
         val atraso = System.currentTimeMillis() - (inicio - 5 * min)
         assertTrue("tocou com atraso de $atraso ms", atraso < 15_000)
+    }
+
+    @Test
+    fun alarme_agendado_impede_o_aparelho_de_cair_no_sono_profundo() {
+        criarReuniao("Logo mais", System.currentTimeMillis() + 15 * min)
+        assertNotNull(AlarmScheduler.sincronizar(c))
+
+        apagarTela()
+        shell("dumpsys deviceidle enable deep")
+        val resposta = shell("dumpsys deviceidle force-idle deep")
+
+        // É a garantia do relógio de alarmes: com despertador próximo, o Android não entra em Doze profundo
+        assertTrue(
+            "o Android não deveria entrar em Doze com alarme próximo (resposta: ${resposta.trim()})",
+            shell("dumpsys deviceidle get deep").trim() != "IDLE",
+        )
+    }
+
+    private fun apagarTela() {
+        val energia = c.getSystemService(PowerManager::class.java)
+        shell("dumpsys battery unplug")
+        // O emulador do CI fica "sempre acordado": sem desligar isso a tela não apaga
+        shell("svc power stayon false")
+        shell("input keyevent KEYCODE_SLEEP")
+        assertTrue("a tela deve apagar", esperar(10_000) { !energia.isInteractive })
+    }
+
+    private fun entrarEmDoze() {
+        apagarTela()
+        // O emulador vem com o Doze desligado: liga antes de forçar (senão o teste não prova nada)
+        shell("dumpsys deviceidle enable deep")
+        val resposta = shell("dumpsys deviceidle force-idle deep")
+        assertTrue(
+            "o aparelho deve estar em Doze (resposta: ${resposta.trim()})",
+            esperar(10_000) { shell("dumpsys deviceidle get deep").trim() == "IDLE" },
+        )
     }
 
     // ---- apoio ----
