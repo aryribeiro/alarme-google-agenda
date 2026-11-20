@@ -17,7 +17,7 @@ export function AudioUnlockBanner() {
               Ative o som do alarme para este dispositivo
             </p>
             <p className="text-[11px] text-bg-primary/80">
-              Necessário para o alarme tocar em segundo plano e com a tela desligada no celular.
+              O navegador só deixa o alarme tocar depois de um clique na página.
             </p>
           </div>
         </div>

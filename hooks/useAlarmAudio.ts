@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AlarmLevel } from '@/types'
 import { getVolumeForLevel } from '@/lib/alarmLogic'
 import { getAdminConfig } from '@/lib/adminAuth'
-import { silentAudio } from '@/lib/silentAudio'
 
 export function useAlarmAudio() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -32,7 +31,6 @@ export function useAlarmAudio() {
     return () => {
       audio.pause()
       audio.src = ''
-      silentAudio.pause()
     }
   }, [])
 
@@ -51,8 +49,6 @@ export function useAlarmAudio() {
       const ctx = new AudioContext()
       await ctx.resume()
       audioContextRef.current = ctx
-
-      await silentAudio.start()
 
       isUnlockedRef.current = true
       setIsUnlocked(true)
@@ -109,9 +105,6 @@ export function useAlarmAudio() {
     const volume = getVolumeForLevel(level, config)
     if (volume === 0) return
 
-    silentAudio.pause()
-    silentAudio.updateMediaSession(true, level === 'maximum' ? '🚨 REUNIÃO AGORA!' : '⚠️ REUNIÃO EM BREVE!')
-
     if (useFallbackRef.current) {
       playFallbackBeep(volume)
     } else {
@@ -146,8 +139,6 @@ export function useAlarmAudio() {
     if (navigator.vibrate) {
       navigator.vibrate(0)
     }
-
-    silentAudio.resume()
   }, [])
 
   return { isUnlocked, unlock, play, stop }

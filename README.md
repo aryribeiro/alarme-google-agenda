@@ -193,7 +193,7 @@ https://seu-app.vercel.app no campo sobre JavaScript...
 ├── workflows/
 │   └── vigia.ts                  # Vigia de push (Vercel Workflows): um por usuário
 ├── public/
-│   ├── som/                      # som.mp3 (alarme) + silencio.mp3 + logo.png
+│   ├── som/                      # som.mp3 (alarme) + logo.png
 │   └── sw.js                     # Service Worker: recebe o push e mostra a notificação
 └── types/
     └── index.ts                  # Interfaces TypeScript
