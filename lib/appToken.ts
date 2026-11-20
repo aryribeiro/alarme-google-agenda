@@ -1,7 +1,7 @@
 // Credencial do app Android: a conta Google do site, cifrada pelo servidor e presa ao aparelho.
 // O app guarda o token e um verificador aleatório que só ele conhece; sem o verificador o token não vale.
 import { createHash } from 'node:crypto'
-import { decryptSecret, encryptSecret } from './vigiaKeys'
+import { decryptSecret, encryptSecret } from './cifra'
 
 export interface AppSession {
   email: string

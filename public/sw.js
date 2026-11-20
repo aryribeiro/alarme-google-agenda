@@ -28,15 +28,14 @@ function showAlarm(alarm) {
   })
 }
 
-// Aviso enviado pelo servidor (vigia): chega com a tela apagada e o navegador fechado
+// O Web Push saiu do app (20/11/2026). Se ainda chegar um aviso antigo do servidor, este navegador
+// cancela a própria inscrição: o servidor passa a receber "não existe" e encerra o vigia que sobrou.
 self.addEventListener('push', (event) => {
-  let alarm = {}
-  try {
-    alarm = event.data ? event.data.json() : {}
-  } catch {
-    // corpo ilegível: ainda assim mostra um aviso genérico (o navegador exige notificação a cada push)
-  }
-  event.waitUntil(showAlarm(alarm))
+  event.waitUntil(
+    self.registration.pushManager.getSubscription()
+      .then((sub) => sub && sub.unsubscribe())
+      .catch(() => undefined)
+  )
 })
 
 // Aviso pedido pela página aberta

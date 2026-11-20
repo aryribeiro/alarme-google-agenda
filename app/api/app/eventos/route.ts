@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { criarTokenApp, desafioDe, lerTokenApp, precisaRenovar, TokenAppInvalido } from '@/lib/appToken'
 import { fetchRooms } from '@/lib/googleCalendar'
-import { InvalidGrantError, listAppEvents, refreshAccessToken } from '@/lib/vigiaGoogle'
+import { InvalidGrantError, listAppEvents, refreshAccessToken } from '@/lib/agendaGoogle'
 
 const SEM_CACHE = { 'Cache-Control': 'no-store' }
 

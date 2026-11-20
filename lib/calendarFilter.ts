@@ -1,4 +1,4 @@
-// Decide se um item da Calendar API v3 merece alarme. Usado pelo app e pelo vigia de push:
+// Decide se um item da Calendar API v3 merece alarme. Usado pelo site e pelo app Android:
 // a decisão mora só aqui.
 
 export interface RawCalendarItem {

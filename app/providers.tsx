@@ -25,12 +25,6 @@ function AlarmProvider({ children }: { children: React.ReactNode }) {
   }, [status, notifications.permission, notifications.requestPermission])
 
   useEffect(() => {
-    if (status === 'authenticated' && notifications.permission === 'granted') {
-      notifications.registerPush()
-    }
-  }, [status, notifications.permission, notifications.registerPush])
-
-  useEffect(() => {
     const alarms = status === 'authenticated' ? polling.activeAlarms : []
     for (const alarm of alarms) {
       notifications.sendNotification(alarm.event, alarm.level)
@@ -40,12 +34,6 @@ function AlarmProvider({ children }: { children: React.ReactNode }) {
   const silenceEvent = useCallback((eventId: string) => {
     audio.stop()
     polling.silenceEvent(eventId)
-    // O vigia do servidor também precisa saber, senão o celular avisa do mesmo jeito
-    fetch('/api/push/silence', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ eventId }),
-    }).catch(() => undefined)
   }, [audio.stop, polling.silenceEvent])
 
   const snoozeEvent = useCallback((eventId: string) => {
@@ -91,8 +79,7 @@ function AlarmProvider({ children }: { children: React.ReactNode }) {
     testAlarm,
     dismissTest,
     isTestActive,
-    disablePush: notifications.unregisterPush,
-  }), [events, activeAlarms, polling.lastSync, polling.isLoading, polling.error, polling.syncNow, silenceEvent, snoozeEvent, audio.isUnlocked, audio.unlock, audio.play, audio.stop, testAlarm, dismissTest, isTestActive, notifications.unregisterPush])
+  }), [events, activeAlarms, polling.lastSync, polling.isLoading, polling.error, polling.syncNow, silenceEvent, snoozeEvent, audio.isUnlocked, audio.unlock, audio.play, audio.stop, testAlarm, dismissTest, isTestActive])
 
   return (
     <AlarmContext.Provider value={value}>

@@ -31,13 +31,7 @@ interface HeaderProps {
 
 export function Header({ lastSync, onSyncNow, isLoading }: HeaderProps) {
   const { data: session } = useSession()
-  const { activeAlarms, disablePush } = useAlarmState()
-
-  const handleSignOut = async () => {
-    // Antes de sair: este aparelho para de receber avisos desta conta
-    await disablePush()
-    signOut({ callbackUrl: '/login' })
-  }
+  const { activeAlarms } = useAlarmState()
 
   const timeSinceSync = lastSync
     ? Math.floor((Date.now() - lastSync.getTime()) / 60000)
@@ -88,7 +82,7 @@ export function Header({ lastSync, onSyncNow, isLoading }: HeaderProps) {
                 />
               )}
               <button
-                onClick={handleSignOut}
+                onClick={() => signOut({ callbackUrl: '/login' })}
                 className="rounded px-2 py-1 text-sm font-bold text-text-primary hover:bg-bg-elevated"
               >
                 Sair

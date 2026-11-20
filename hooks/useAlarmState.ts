@@ -24,7 +24,6 @@ export interface AlarmContextType {
   testAlarm: () => void
   dismissTest: () => void
   isTestActive: boolean
-  disablePush: () => Promise<void>
 }
 
 export const AlarmContext = createContext<AlarmContextType>({
@@ -43,7 +42,6 @@ export const AlarmContext = createContext<AlarmContextType>({
   testAlarm: () => {},
   dismissTest: () => {},
   isTestActive: false,
-  disablePush: async () => {},
 })
 
 export function useAlarmState() {

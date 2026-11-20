@@ -1,6 +1,6 @@
 {
   "name": "alarme-google-agenda-2026",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -14,29 +14,17 @@
     "next": "^16.4.6",
     "next-auth": "^4.24.15",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "web-push": "^4.0.0",
-    "workflow": "^5.5.0"
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@types/web-push": "^3.6.4",
     "@vitest/coverage-v8": "^5.1.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.7.2",
     "vitest": "^5.1.0"
-  },
-  "overrides": {
-    "@vercel/cli-auth": {
-      "zod": "4.6.7"
-    },
-    "@vercel/queue": {
-      "zod": "4.6.7"
-    },
-    "minimatch@^10": "11.0.8"
   }
 }

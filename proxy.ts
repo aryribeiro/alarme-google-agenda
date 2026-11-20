@@ -21,9 +21,7 @@ export const config = {
     // Ficam fora deste filtro:
     // - sw.js, timerWorker.js, manifest.json, som/: públicos; redirecioná-los para /login os quebra calados
     // - api/auth: o próprio login
-    // - api/calendar/webhook: quem chama é o Google, sem sessão (autentica pelo token do canal)
     // - api/app: o app Android, autenticado pelo token do app
-    // - .well-known/workflow/: chamadas internas do Workflows
-    '/((?!api/auth|api/calendar/webhook|api/app|\\.well-known/workflow/|_next/static|_next/image|som|favicon.ico|sw.js|timerWorker.js|manifest.json).*)',
+    '/((?!api/auth|api/app|_next/static|_next/image|som|favicon.ico|sw.js|timerWorker.js|manifest.json).*)',
   ],
 }

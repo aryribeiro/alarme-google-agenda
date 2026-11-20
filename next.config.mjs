@@ -1,5 +1,3 @@
-import { withWorkflow } from 'workflow/next'
-
 const isDev = process.env.NODE_ENV !== 'production'
 
 // 'unsafe-inline' em script-src: o Next injeta scripts inline de hidratação; sem nonce não há como remover.
@@ -37,5 +35,4 @@ const nextConfig = {
   },
 }
 
-// withWorkflow habilita 'use workflow' / 'use step' (vigia de push em workflows/)
-export default withWorkflow(nextConfig)
+export default nextConfig
